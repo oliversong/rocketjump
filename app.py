@@ -12,6 +12,7 @@ import  time, os
 from flask import Flask, render_template, request, redirect, url_for, abort, g, flash, escape, session
 from werkzeug import check_password_hash, generate_password_hash
 from datetime import datetime
+from flask.ext.sqlalchemy import SQLAlchemy
 
 # config
 DEBUG = True
