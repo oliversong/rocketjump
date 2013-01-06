@@ -1,0 +1,6 @@
+Coffeescript compiler:
+	coffee -cw app.coffee
+To put in background:
+	ctrl-z
+	bg 1
+
