@@ -45,6 +45,11 @@ def about():
     """Render the website's about page."""
     return render_template('about.html')
 
+@app.route('/robots.txt')
+def robots():
+    res = app.make_response('User-agent: *\nAllow: /')
+    res.mimetype = 'text/plain'
+    return res
 
 ###
 # The functions below should be applicable to all Flask apps.
