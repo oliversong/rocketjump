@@ -22,11 +22,14 @@ PASSWORD = "default"
 
 # make app
 app = Flask(__name__)
+#heroku
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
+#local
+#app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/rocketjumpdb'
 db = SQLAlchemy(app)
 app.config.from_object(__name__)
 
-class User(db.model):
+class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80))
     email = db.Column(db.String(120), unique=True)
