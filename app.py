@@ -1,10 +1,10 @@
 """
-	Rocketjump
-	~~~~~~~~~~
+    Rocketjump
+    ~~~~~~~~~~
 
-	Ho ho ho.
+    Ho ho ho.
 
-	6.470.
+    6.470.
 """
 
 from __future__ import with_statement
@@ -12,21 +12,37 @@ import  time, os
 from flask import Flask, render_template, request, redirect, url_for, abort, g, flash, escape, session
 from werkzeug import check_password_hash, generate_password_hash
 from datetime import datetime
+from flask_oauth import OAuth
 from flask.ext.sqlalchemy import SQLAlchemy
 
 # config
 DEBUG = True
 PER_PAGE = 20
 SECRET_KEY = "devopsborat"
+FACEBOOK_APP_ID = '124499577716801'
+FACEBOOK_APP_SECRET = '8f3dc21d612f5ef19dbc98221e1c7a0d'
 
 # make app
 app = Flask(__name__)
 #heroku
 #app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
 #local
+app.debug = DEBUG
+app.secret_key = SECRET_KEY
+oauth = OAuth()
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/rocketjumpdb'
 db = SQLAlchemy(app)
 app.config.from_object(__name__)
+
+facebook = oauth.remote_app('facebook',
+    base_url='https://graph.facebook.com/',
+    request_token_url=None,
+    access_token_url='/oauth/access_token',
+    authorize_url='https://www.facebook.com/dialog/oauth',
+    consumer_key=FACEBOOK_APP_ID,
+    consumer_secret=FACEBOOK_APP_SECRET,
+    request_token_params={'scope':'email,user_birthday,user_location,user_photos,publish_actions'}
+    )
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -64,6 +80,28 @@ def index():
     """Render website's home page."""
     return render_template('index.html')
 
+@app.route('/login')
+def login():
+    return facebook.authorize(callback=url_for('facebook_authorized',
+        next=request.args.get('next') or request.referrer or None,
+        _external=True))
+
+@app.route('/login/authorized')
+@facebook.authorized_handler
+def facebook_authorized(resp):
+    if resp is None:
+        return 'Access denied: reason=%s error=%s' %(
+            request.args['error_reason'],
+            request.args['error_descriptions']
+        )
+    session['oauth_token'] = (resp['access_token'], '')
+    me = facebook.get('/me')
+    return 'Loggin in as id=%s name=%s redirect=%s' % \
+        (me.data['id'], me.data['name'], request.args.get('next'))
+
+@facebook.tokengetter
+def get_facebook_oauth_token():
+    return session.get('oauth_token')
 
 @app.route('/about/')
 def about():

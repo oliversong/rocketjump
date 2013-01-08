@@ -3,10 +3,10 @@
     <head>
         <meta charset="utf-8">
 
-        <title>Rocketjump | {% block title %}{% endblock %}</title>
+        <title>{% block title %}Welcome{% endblock %} | Notability</title>
 
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <meta name="description" content="Entry for 6.470 2013.">
+        <meta name="description" content="Find a special someone to take notes with in class! An entry to the MIT 6.470 web programming competition.">
         <meta name="author" content="Oliver Song">
         <link rel="shortcut icon" href="/static/favicon.ico">
 
@@ -25,62 +25,6 @@
     </head>
 
     <body>
-
-        <div id="fb-root"></div>
-        <script>
-            // Additional JS functions here
-            window.fbAsyncInit = function() {
-                FB.init({
-                    appId      : '124499577716801', // App ID
-                    channelUrl : '//rocketjump.herokuapp.com//channel.html', // Channel File
-                    status     : true, // check login status
-                    cookie     : true, // enable cookies to allow the server to access the session
-                    xfbml      : true  // parse XFBML
-                });
-
-                // Additional init code here
-
-                FB.getLoginStatus(function(response) {
-                    if (response.status === 'connected') {
-                        // connected. Show their facebook profile picture and link to their user page
-                        console.log("connected facebook account detected")
-                        // userID should be in session
-                        //response.authResponse['userID']
-                    } else if (response.status === 'not_authorized') {
-                        // not_authorized. Show login button
-                        $('#loginButton').click(function(){
-                            console.log("attempting to do the login")
-                            login();
-                        });
-                    } else {
-                        // not_logged_in. Show login button
-                        $('#loginButton').click(function(){
-                            console.log("attempting to do the login")
-                            login();
-                        });
-                    }
-                });
-            };
-
-            function login() {
-                FB.login(function(response) {
-                    if (response.authResponse) {
-                        // connected
-                    } else {
-                        // cancelled
-                    }   
-                });
-            }
-
-            // Load the SDK Asynchronously
-            (function(d){
-                var js, id = 'facebook-jssdk', ref = d.getElementsByTagName('script')[0];
-                if (d.getElementById(id)) {return;}
-                js = d.createElement('script'); js.id = id; js.async = true;
-                js.src = "//connect.facebook.net/en_US/all.js";
-                ref.parentNode.insertBefore(js, ref);
-            }(document));
-        </script>
 
         <header>
             {% include "header.html" %}

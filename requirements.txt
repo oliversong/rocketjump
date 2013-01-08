@@ -1,4 +1,5 @@
 Flask==0.9
+Flask-OAuth==0.12
 Flask-SQLAlchemy==0.16
 Jinja2==2.6
 SQLAlchemy==0.8.0b2
@@ -7,6 +8,8 @@ distribute==0.6.34
 gevent==0.13.8
 greenlet==0.4.0
 gunicorn==0.17.1
+httplib2==0.7.7
 mock==1.0.1
+oauth2==1.5.211
 psycopg2==2.4.6
 wsgiref==0.1.2
