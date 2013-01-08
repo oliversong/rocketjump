@@ -18,14 +18,13 @@ from flask.ext.sqlalchemy import SQLAlchemy
 DEBUG = True
 PER_PAGE = 20
 SECRET_KEY = "devopsborat"
-PASSWORD = "default"
 
 # make app
 app = Flask(__name__)
 #heroku
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
+#app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
 #local
-#app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/rocketjumpdb'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/rocketjumpdb'
 db = SQLAlchemy(app)
 app.config.from_object(__name__)
 
@@ -47,6 +46,14 @@ def url_for_other_page(page):
     return url_for(request.endpoint, **args)
 app.jinja_env.globals['url_for_other_page'] = url_for_other_page
 
+
+#app.before_request
+def before_request():
+    g.user = None
+    if 'user_id' in session:
+        g.user = db.session.query(User).from_statement(
+            "SELECT * FROM users where user_id=:user_id").\
+            params(user_id=session['user_id']).all()[0]
 
 ###
 # Routing for your application.

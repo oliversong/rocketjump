@@ -1,6 +1,6 @@
 # Notes for rocketjumper
 
-##Coffeescript compiler
+## Coffeescript compiler
 
 To run:
 
@@ -11,7 +11,7 @@ To put in background:
 	ctrl-z
 	bg 1
 
-##Local Postgresql server
+## Local Postgresql server
 
 start:
 
@@ -51,3 +51,9 @@ pg db use:
 	db.session.delete(user)
 	User.query.all()
 	db.session.commit()
+
+## Misc
+
+Starting the server:
+
+	foreman start
