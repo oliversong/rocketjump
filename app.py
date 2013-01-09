@@ -34,6 +34,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/rocketjumpdb'
 db = SQLAlchemy(app)
 app.config.from_object(__name__)
 
+
 facebook = oauth.remote_app('facebook',
     base_url='https://graph.facebook.com/',
     request_token_url=None,
@@ -44,17 +45,89 @@ facebook = oauth.remote_app('facebook',
     request_token_params={'scope':'email,user_birthday,user_location,user_photos,publish_actions'}
     )
 
+# many to many relationships
+
+# a note can have many assets, and an asset can have many notes
+assetTable = db.Table('assetTable',
+    db.Column('note_id', db.Integer, db.ForeignKey('notes.id')),
+    db.Column('asset_id', db.Integer, db.ForeignKey('assets.id'))
+)
+
+# a user can have many courses, and a course can have many users
+
+# a user can have many lectures, and a lecture can have many users
+
+# a user can have many notes, and a note can have many users
+
 class User(db.Model):
+    __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
+    fid = db.Column(db.Integer, unique=True)
     name = db.Column(db.String(80))
     email = db.Column(db.String(120), unique=True)
+    courses = db.relationship('Course', backref='users', lazy='dynamic')
+    lectures = db.relationship('Lecture', backref='users', lazy='dynamic')
+    notes = db.relationship('Note', backref='users', lazy='dynamics')
 
-    def __init__(self, name, email):
+    def __init__(self, fid, name, email):
+        self.fid = fid
         self.name = name
         self.email = email
 
     def __repr__(self):
         return '<Name %r>' % self.name
+
+class Course(db.Model):
+    __tablename__ = 'courses'
+    id = db.Column(db.Integer, primary_key=True)
+    location = db.Column(db.String(80))
+    professor = db.Column(db.String(80))
+    description = db.Column(db.String(3000))
+    lectures = db.relationship('Lecture', backref='courses', lazy='dynamic')
+    notes = db.relationship('Note', backref='courses', lazy='dynamic')
+    user_id = db.Column(db.Integer, db.ForeignKey('users.fid'))
+
+    def __init__(self, location, professor, description):
+        self.location = location
+        self.professor = professor
+        self.description = description
+
+class Lecture(db.Model):
+    __tablename__ = 'lectures'
+    id = db.Column(db.Integer, primary_key=True)
+    date = db.Column(db.DATE)
+    notes = db.relationship('Note', backref='lectures', lazy='dynamic')
+    assets = db.relationship('Asset', backref='lectures', lazy='dynamic')
+    course_id = db.Column(db.Integer, db.ForeignKey('courses.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('users.fid'))
+
+    def __init__(self, date):
+        self.date = date
+
+class Note(db.Model):
+    __tablename__ = 'notes'
+    id = db.Column(db.Integer, primary_key=True)
+    datetime = db.Column(db.DATETIME)
+    content = db.Column(db.String(50000))
+    assets = db.relationship('Asset', secondary=assetTable, backref=db.backref('notes', lazy='dynamic'))
+    course_id = db.Column(db.Integer, db.ForeignKey('courses.id'))
+    lecture_id = db.Column(db.Integer, db.ForeignKey('lectures.id'))
+    collaborators = db.Column(db.Integer, db.ForeignKey('users.fid'))
+
+    def __init__(self, datetime, content):
+        self.datetime = datetime
+        self.content = content
+
+class Asset(db.Model):
+    __tablename__ = 'assets'
+    id = db.Column(db.Integer, primary_key=True)
+    location = db.Column(db.String(500))
+    author = db.Column(db.String(80))
+    lecture_id = db.Column(db.Integer, db.ForeignKey('lectures.id'))
+
+    def __init__(self, location, author):
+        self.location = location
+        self.author = author
 
 def url_for_other_page(page):
     args = request.view_args.copy()
@@ -66,10 +139,10 @@ app.jinja_env.globals['url_for_other_page'] = url_for_other_page
 #app.before_request
 def before_request():
     g.user = None
-    if 'user_id' in session:
+    if 'fid' in session:
         g.user = db.session.query(User).from_statement(
-            "SELECT * FROM users where user_id=:user_id").\
-            params(user_id=session['user_id']).all()[0]
+            "SELECT * FROM users where fid=:user_id").\
+            params(user_id=session['fid']).all()[0]
 
 ###
 # Routing for your application.
@@ -90,18 +163,37 @@ def login():
 @facebook.authorized_handler
 def facebook_authorized(resp):
     if resp is None:
-        return 'Access denied: reason=%s error=%s' %(
+        error = 'Access denied: reason=%s error=%s' %(
             request.args['error_reason'],
             request.args['error_descriptions']
         )
-    session['oauth_token'] = (resp['access_token'], '')
+        return render_template('home.html', error=error)
+    xyz = (resp['access_token'], '')
+    session['oauth_token'] = xyz
     me = facebook.get('/me')
-    return 'Loggin in as id=%s name=%s redirect=%s' % \
-        (me.data['id'], me.data['name'], request.args.get('next'))
+    if not db.session.query(User).filter(User.fid==me.data['id']):
+        newuser = User(me.data['id'],me.data['name'],me.data['email'])
+        db.session.add(newuser)
+        db.session.commit()
+    flash('You were logged in')
+    session['fid'] = me.data['id']
+    return redirect(url_for('home'))
 
 @facebook.tokengetter
 def get_facebook_oauth_token():
     return session.get('oauth_token')
+
+@app.route('/logout')
+def logout():
+    """Log out dat"""
+    flash('You were logged out')
+    session.pop('fid', None)
+    return redirect(url_for('index'))
+
+@app.route('/home/')
+def home():
+    raise Exception("hello")
+    return render_template('home.html')
 
 @app.route('/about/')
 def about():
