@@ -52,6 +52,20 @@ pg db use:
 	User.query.all()
 	db.session.commit()
 
+make/drop tables
+
+	python
+	>>> from app import db
+	>>> db.drop_all()
+	>>> db.create_all()
+
+	#if dependent, issue commands from psql
+	psql rocketjumpdb
+	>>> drop table blah_table cascade;
+	>>> \d
+	No relations found
+	>>> \q
+
 ## Misc
 
 Starting the server:

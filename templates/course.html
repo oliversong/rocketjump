@@ -1,0 +1,39 @@
+{% extends "layout.html" %}
+
+{% block body %}
+{{ course.name }}
+<br />
+
+{% if enrolled %}
+	{% if course.live %}
+		Class is in session right now! <button class='jumpin'>Jump in</button>
+	{% else %}
+		Is lecture starting? <button class'startclass'>Begin class</button>
+	{% endif %}
+{% else %}
+	<!--<button class='enroll'>Enroll</button>-->
+	<form action="{{ url_for('course', coursename=course.name) }}" method=post>
+		<input type=submit value='Enroll'>
+	</form>
+{% endif %}
+<br />
+People who take this course
+{% for student in course.users %}
+	<div class='student'>
+		<div class="profilePic" style="background-image:url({{ student.picurl }});"></div>
+		{{ student.name }}
+	</div>
+{% endfor %}
+
+Public notes
+{% for note in course.notes %}
+	{% if note.public %}
+		<div class='note'>
+			{{ note.name }}
+			{{ note.date }}
+			{{ note.users }}
+		</div>
+	{% endif %}
+{% endfor %}
+
+{% endblock %}

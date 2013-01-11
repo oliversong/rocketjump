@@ -1,7 +1,46 @@
 {% extends "layout.html" %}
 
 {% block body %}
-Welcome back!
+Welcome!
 <br />
+
+<div class="profilePic" style="background-image:url({{ g.user.picurl }});"></div>
+
+<form action="{{ url_for('find') }}" method=post>
+	<input type=text name=courseName size=120>
+	<input type=submit value='Find'>
+</form>
+
+<ul class="courses">
+	{% for course in g.user.courses %}
+	<li class='span3'>{{ course.name }}</li>
+	{% else %}
+	<li class='span3'>No courses so far!</li>
+	{% endfor %}
+</ul>
+
+<ul class="notes">
+	{% for note in g.user.notes %}
+	<li class='span3'>{{ note.name + ' (' + note.date + ')' }}</li>
+	{% else %}
+	<li class='span3'>No notes so far!</li>
+	{% endfor %}
+</ul>
+
+<ul class="collaborators">
+	{% for collaborator in collaborators %}
+	<li class='span3'>{{ collaborator.name }}</li>
+	{% else %}
+	<li class='span3'>No collaborators yet!</li>
+	{% endfor %}
+</ul>
+
+<ul class="suggestions">
+	{% for course in suggested %}
+	<li class='span3'>{{ course.name }}</li>
+	{% else %}
+	<li class='span3'>No suggestions so far!</li>
+	{% endfor %}
+</ul>
 
 {% endblock %}

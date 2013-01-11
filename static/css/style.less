@@ -1,13 +1,12 @@
 @linkColor: #000;
 @import "less/mixins.less";
 @pink: #be1a8d;
+@picback: #CCC;
 
-.custom-highlight{
-    background: @pink;
-    color: #fff;
-    text-shadow: -1px 1px 1px darken(@pink, 15%);
+.profilePic{
+	position:relative;
+	width:200px;
+	height:200px;
+	background-color:@picback;
+	background-repeat:no-repeat;
 }
-
-/* Apply custom highlight */
-::-moz-selection{ .custom-highlight; }
-::selection { .custom-highlight; }
