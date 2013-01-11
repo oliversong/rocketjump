@@ -26,9 +26,9 @@ FACEBOOK_APP_SECRET = '8f3dc21d612f5ef19dbc98221e1c7a0d'
 # make app
 app = Flask(__name__)
 #heroku
-#app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
 #local
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/rocketjumpdb'
+#app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/rocketjumpdb'
 app.debug = DEBUG
 app.secret_key = SECRET_KEY
 oauth = OAuth()
