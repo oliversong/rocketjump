@@ -5,3 +5,9 @@ $('.enroll').click ()->
 		console.log("Successfully enrolled")
 		$('.enroll').remove()
 		)
+
+$('.startClass').click ()->
+	pathname = window.location.pathname
+	$.post(pathname+'/match',(d,st,xr)->
+		console.log("Boom")
+		)

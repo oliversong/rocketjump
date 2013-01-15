@@ -13,4 +13,12 @@
     });
   });
 
+  $('.startClass').click(function() {
+    var pathname;
+    pathname = window.location.pathname;
+    return $.post(pathname + '/match', function(d, st, xr) {
+      return console.log("Boom");
+    });
+  });
+
 }).call(this);

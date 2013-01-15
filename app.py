@@ -98,18 +98,18 @@ class User(db.Model):
     name = db.Column(db.String(80))
     email = db.Column(db.String(120), unique=True)
     picurl = db.Column(db.String(120))
-    courses = db.relationship('Course', secondary=courseTable, backref=db.backref('users', lazy='dynamic'))
-    lectures = db.relationship('Lecture', secondary=lectureTable, backref=db.backref('users', lazy='dynamic'))
-    notes = db.relationship('Note', secondary=noteTable, backref=db.backref('users', lazy='dynamic'))
-    queues = db.relationship('MatchQueue', secondary=queueTable, backref=db.backref('users', lazy='dynamic'))
-    authorID = db.Column(db.BigInteger, unique=True)
+    courses = db.relationship('Course', secondary=courseTable, backref='users')
+    lectures = db.relationship('Lecture', secondary=lectureTable, backref='users')
+    notes = db.relationship('Note', secondary=noteTable, backref='users')
+    queues = db.relationship('MatchQueue', secondary=queueTable, backref='users')
+    authorID = db.Column(db.String(120), unique=True)
 
     def __init__(self, fid, name, email, username):
         self.fid = fid
         self.name = name
         self.email = email
         self.picurl = "http://graph.facebook.com/"+username+"/picture?width=200&height=200"
-        self.authorID = pad.createAuthorIfNotExistsFor(fid,name)['data']['authorID']
+        self.authorID = pad.createAuthorIfNotExistsFor(fid,name)['authorID']
 
     def __repr__(self):
         return '<Name %r>' % self.name
@@ -137,7 +137,7 @@ class Course(db.Model):
 class Lecture(db.Model):
     __tablename__ = 'lectures'
     id = db.Column(db.Integer, primary_key=True)
-    date = db.Column(db.DATE)
+    date = db.Column(db.String(120))
     notes = db.relationship('Note', backref='lecture', lazy='dynamic')
     assets = db.relationship('Asset', backref='lecture', lazy='dynamic')
     course_id = db.Column(db.Integer, db.ForeignKey('courses.id'))
@@ -147,13 +147,12 @@ class Lecture(db.Model):
 
     def __init__(self, date):
         self.date = date
-        self.groupID = pad.createGroupIfNotExistsFor(self.course.name+str(date))['data']['groupID']
 
 class Note(db.Model):
     __tablename__ = 'notes'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(120))
-    date = db.Column(db.DATE)
+    date = db.Column(db.String(120))
     assets = db.relationship('Asset', secondary=assetTable, backref=db.backref('notes', lazy='dynamic'))
     course_id = db.Column(db.Integer, db.ForeignKey('courses.id'))
     lecture_id = db.Column(db.Integer, db.ForeignKey('lectures.id'))
@@ -323,7 +322,7 @@ def createPad(user,course,lecture):
 
 def createLecture(user, course):
     # create new lecture
-    now = datetime.datetime.now()
+    now = datetime.now()
     dt = now.strftime("%Y-%m-%d-%H-%M")
     newLecture = Lecture(dt)
     db.session.add(newLecture)
@@ -332,10 +331,12 @@ def createLecture(user, course):
     # add lecture to course, add new queue to lecture, add user to queue
     newLecture.queue = MatchQueue()
     course.lectures.append(newLecture)
+    newLecture.groupID = pad.createGroupIfNotExistsFor(newLecture.course.name+dt)['groupID']
 
+    db.session.commit()
     return newLecture
 
-@app.route('/<coursename>/match', methods=['POST'])
+@app.route('/<coursename>/match', methods=['GET','POST'])
 def match(coursename):
     if request.method == 'POST':
         if 'fid' not in session:
@@ -344,7 +345,8 @@ def match(coursename):
 
         user = db.session.query(User).filter(User.fid == session['fid']).all()[0]
         courseobj = db.session.query(Course).filter(Course.name == coursename).all()[0]
-        liveLectures = filter(courseobj.lectures, lambda lecture: lecture.live == True)
+        #raise Exception("hi")
+        liveLectures = filter(lambda lecture: lecture.live == True, courseobj.lectures)
 
         if len(liveLectures)==0:
             # course isn't live
