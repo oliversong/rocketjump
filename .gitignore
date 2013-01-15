@@ -17,6 +17,7 @@ parts
 var
 develop-eggs
 .installed.cfg
+src
 
 # Pip Installer Log
 pip-log.txt
