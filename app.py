@@ -15,20 +15,27 @@ from datetime import datetime
 from flask_oauth import OAuth
 from flask.ext.sqlalchemy import SQLAlchemy
 from sqlalchemy import desc
+from py_etherpad import EtherpadLiteClient
 
 # config
 DEBUG = True
 PER_PAGE = 20
 SECRET_KEY = "devopsborat"
+
+# facebook api connection
 FACEBOOK_APP_ID = '124499577716801'
 FACEBOOK_APP_SECRET = '8f3dc21d612f5ef19dbc98221e1c7a0d'
+
+# etherpad api connection
+apiKey = "1zt8snBRk4XG242X4KfSOc0tcQSxH4vs"
+pad = EtherpadLiteClient(apiKey,'http://0.0.0.0:9001/api')
 
 # make app
 app = Flask(__name__)
 #heroku
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
+#app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
 #local
-#app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/rocketjumpdb'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/rocketjumpdb'
 app.debug = DEBUG
 app.secret_key = SECRET_KEY
 oauth = OAuth()
@@ -78,6 +85,11 @@ noteTable = db.Table('noteTable',
     db.Column('note_id', db.Integer, db.ForeignKey('notes.id'))
 )
 
+# a user can be in many queues, and a queue can have many users
+queueTable = db.Table('queueTable',
+    db.Column('queue_id', db.Integer, db.ForeignKey('queues.id')),
+    db.Column('user_id', db.BigInteger, db.ForeignKey('users.id'))
+)
 
 class User(db.Model):
     __tablename__ = 'users'
@@ -89,12 +101,15 @@ class User(db.Model):
     courses = db.relationship('Course', secondary=courseTable, backref=db.backref('users', lazy='dynamic'))
     lectures = db.relationship('Lecture', secondary=lectureTable, backref=db.backref('users', lazy='dynamic'))
     notes = db.relationship('Note', secondary=noteTable, backref=db.backref('users', lazy='dynamic'))
+    queues = db.relationship('MatchQueue', secondary=queueTable, backref=db.backref('users', lazy='dynamic'))
+    authorID = db.Column(db.BigInteger, unique=True)
 
     def __init__(self, fid, name, email, username):
         self.fid = fid
         self.name = name
         self.email = email
         self.picurl = "http://graph.facebook.com/"+username+"/picture?width=200&height=200"
+        self.authorID = pad.createAuthorIfNotExistsFor(fid,name)['data']['authorID']
 
     def __repr__(self):
         return '<Name %r>' % self.name
@@ -107,10 +122,9 @@ class Course(db.Model):
     professor = db.Column(db.String(80))
     profemail = db.Column(db.String(80))
     description = db.Column(db.String(3000))
-    lectures = db.relationship('Lecture', backref='courses', lazy='dynamic')
-    notes = db.relationship('Note', backref='courses', lazy='dynamic')
+    lectures = db.relationship('Lecture', backref='course', lazy='dynamic')
+    notes = db.relationship('Note', backref='course', lazy='dynamic')
     count = db.Column(db.Integer)
-    live = db.Column(db.Boolean)
 
     def __init__(self, name, location, professor, profemail, description):
         self.name = name
@@ -124,29 +138,35 @@ class Lecture(db.Model):
     __tablename__ = 'lectures'
     id = db.Column(db.Integer, primary_key=True)
     date = db.Column(db.DATE)
-    notes = db.relationship('Note', backref='lectures', lazy='dynamic')
-    assets = db.relationship('Asset', backref='lectures', lazy='dynamic')
+    notes = db.relationship('Note', backref='lecture', lazy='dynamic')
+    assets = db.relationship('Asset', backref='lecture', lazy='dynamic')
     course_id = db.Column(db.Integer, db.ForeignKey('courses.id'))
+    queue = db.relationship('MatchQueue', backref='lecture', lazy='dynamic')
+    live = db.Column(db.Boolean, default=False)
+    groupID = db.Column(db.BigInteger, unique=True)
 
     def __init__(self, date):
         self.date = date
+        self.groupID = pad.createGroupIfNotExistsFor(self.course.name+str(date))['data']['groupID']
 
 class Note(db.Model):
     __tablename__ = 'notes'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(120))
     date = db.Column(db.DATE)
-    content = db.Column(db.String(50000))
     assets = db.relationship('Asset', secondary=assetTable, backref=db.backref('notes', lazy='dynamic'))
     course_id = db.Column(db.Integer, db.ForeignKey('courses.id'))
     lecture_id = db.Column(db.Integer, db.ForeignKey('lectures.id'))
-    public = db.Column(db.Boolean)
+    public = db.Column(db.Boolean, default=False)
 
-    def __init__(self, name, date, content):
-        self.name = name
+    def __init__(self, date):
         self.date = date
-        self.content = content
-        self.public = False
+        pad.createGroupPad(self.lecture.groupID,self.id)
+
+class MatchQueue(db.Model):
+    __tablename__ = 'queues'
+    id = db.Column(db.Integer, primary_key=True)
+    lecture_id = db.Column(db.Integer, db.ForeignKey('lectures.id'))
 
 class Asset(db.Model):
     __tablename__ = 'assets'
@@ -158,6 +178,13 @@ class Asset(db.Model):
     def __init__(self, location, author):
         self.location = location
         self.author = author
+
+def matchmake(lecture):
+    # SHIIIEEET BLACK BOX ALGORITHM BRO
+    if len(lecture.queue)!=0:
+        return lecture.queue.pop(0)
+    else:
+        return None
 
 def url_for_other_page(page):
     args = request.view_args.copy()
@@ -259,7 +286,7 @@ def course(coursename):
     """Course page"""
     courseobj = db.session.query(Course).filter(Course.name == coursename).all()
     if len(courseobj)==0:
-        flash('No lectures found by that name.')
+        flash('No courses found by that name.')
         redirect(url_for('home'))
     elif len(courseobj)>1:
         raise Exception('More than one course by that name...uh oh.')
@@ -273,11 +300,87 @@ def course(coursename):
             db.session.commit()
             enrolled = True
         else:
-            if courseobj[0].id in g.user.courses:
+            if courseobj[0] in g.user.courses:
                 enrolled = True
             else:
                 enrolled = False
     return render_template('course.html', course=courseobj[0], enrolled=enrolled)
+
+def createPad(user,course,lecture):
+    lecture.queue.users.append(user)
+    # make new etherpad for user to wait in
+    newNote = Note(dt) # init also creates a new pad at /p/groupID$noteID
+    db.session.add(newNote)
+    #db.session.commit()
+
+    # add note to user, course, and lecture
+    user.notes.append(newNote)
+    course.notes.append(newNote)
+    lecture.notes.append(newNote)
+    db.session.commit()
+
+    return newNote
+
+def createLecture(user, course):
+    # create new lecture
+    now = datetime.datetime.now()
+    dt = now.strftime("%Y-%m-%d-%H-%M")
+    newLecture = Lecture(dt)
+    db.session.add(newLecture)
+    db.session.commit()
+
+    # add lecture to course, add new queue to lecture, add user to queue
+    newLecture.queue = MatchQueue()
+    course.lectures.append(newLecture)
+
+    return newLecture
+
+@app.route('/<coursename>/match', methods=['POST'])
+def match(coursename):
+    if request.method == 'POST':
+        if 'fid' not in session:
+            abort(401)
+
+
+        user = db.session.query(User).filter(User.fid == session['fid']).all()[0]
+        courseobj = db.session.query(Course).filter(Course.name == coursename).all()[0]
+        liveLectures = filter(courseobj.lectures, lambda lecture: lecture.live == True)
+
+        if len(liveLectures)==0:
+            # course isn't live
+
+            newLecture = createLecture(user, courseobj)
+
+            # make new pad
+            newNote = createPad(user,courseobj,newLecture)
+
+            # make lecture live
+            newLecture.live = True
+            db.session.commit()
+
+            redirect('http://0.0.0.0:9001/p/'+newLecture.groupID+"$"+newNote.id)
+
+        elif len(liveLectures)==1:
+            # course is live
+
+            # do matchmaking, but there may not actually be a match
+            matchedUser = matchmake(liveLectures[0])
+            if matchedUser != None:
+                # there is a user waiting; pair them up
+                # remove other user from queue
+                liveLectures[0].queue.remove(matchedUser)
+                # add current user to note
+                user.notes.append(matchedUser.notes[-1])
+                # everyone who is on the queue should already be in a pad, so just redirect the person to their note url
+                redirect('http://0.0.0.0:9001/p/'+liveLectures[0].groupID+"$"+matchedUser.notes[-1].id)
+            else:
+                # there is no user waiting; everyone is paired up
+                # lecture already exists; create note and put user in it
+                newNote = createPad(user,courseobj,liveLectures[0])
+                redirect('http://0.0.0.0:9001/p/'+liveLectures[0].groupID+"$"+newNote.id)
+        else:
+            # dafuq
+            abort(401)
 
 @app.route('/about/')
 def about():

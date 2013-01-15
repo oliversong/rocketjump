@@ -42,8 +42,8 @@ to install / make db:
 	heroku addons:add heroku-postgresql:dev
 	heroku pg:promote HEROKU_POSTGRESQL_COLOR
 	heroku run python
-	>>> from app import db
-	>>> db.create_all()
+	>>> from app import initdb
+	>>> initdb()
 
 pg db use:
 
@@ -71,3 +71,7 @@ make/drop tables
 Starting the server:
 
 	foreman start
+
+## Game plan
+
+Let's use the etherpad lite api to supply group note taking services. We can hook it up to the application with the pyetherpadlite client library. So far so good. We'll have to host our own etherpadlite server (nodejitsu?). After that we 
