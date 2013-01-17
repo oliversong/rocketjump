@@ -6,9 +6,14 @@
 
 {% if enrolled %}
 	{% if course.live %}
-		Class is in session right now! <button class='jumpIn'>Jump in</button>
+		Class is in session right now!
+		<form action="{{ url_for('match', coursename=course.name) }}" method=get>
+			<input type=submit value="Jump in">
+		</form>
 	{% else %}
-		Is lecture starting? <button class='startClass'>Begin class</button>
+		<form action="{{ url_for('match', coursename=course.name) }}" method=get>
+			<input type=submit value="Begin class">
+		</form>
 	{% endif %}
 {% else %}
 	<!--<button class='enroll'>Enroll</button>-->

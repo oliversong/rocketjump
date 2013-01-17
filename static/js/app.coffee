@@ -8,6 +8,6 @@ $('.enroll').click ()->
 
 $('.startClass').click ()->
 	pathname = window.location.pathname
-	$.post(pathname+'/match',(d,st,xr)->
+	$.get(pathname+'match',(d,st,xr)->
 		console.log("Boom")
 		)

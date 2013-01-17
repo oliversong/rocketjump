@@ -1,0 +1,11 @@
+{% extends "layout.html" %}
+
+{% block body %}
+{{ note.course.name }}
+{{ note.lecture.date }}
+<br />
+
+<iframe seamless='seamless' class='notepad' src="{{ note.url }}"></iframe>
+
+
+{% endblock %}

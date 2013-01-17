@@ -1,0 +1,61 @@
+User
+	has many
+		Course
+		Lecture
+		Note
+		Queue
+Course
+	has many
+		User
+		Lecture
+		Note
+
+
+Lecture
+	has many
+		User
+		Asset
+
+	has one
+		Course
+		Queue
+
+Queue
+	has one
+		Lecture
+
+	has many
+		User
+
+Note
+	has many
+		User
+		Asset
+
+	has one
+		Lecture
+		Course
+
+Asset
+	has many
+		Note
+
+	has one
+		Lecture
+
+
+Many to many
+x	User-Course
+x	User-Lecture
+x	User-Queue
+x	User-Note
+x	Note-Asset
+
+One to many
+	Course-Lecture
+	Lecture-Note
+	Lecture-Asset
+	Course-Note
+
+One to one
+x	Lecture-Queue
