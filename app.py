@@ -28,7 +28,10 @@ FACEBOOK_APP_SECRET = '8f3dc21d612f5ef19dbc98221e1c7a0d'
 
 # etherpad api connection
 apiKey = "qSoNop1JjHxPQcJkv3L5rrmgBrqNgC1t"
-pad = EtherpadLiteClient(apiKey,'http://0.0.0.0:9001/api')
+# local
+# pad = EtherpadLiteClient(apiKey,'http://0.0.0.0:9001/api')
+# remote
+pad = EtherpadLiteClient(apiKey,'http://goombastomp.cloudfoundry.com/')
 
 # make app
 app = Flask(__name__)
