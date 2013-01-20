@@ -21,4 +21,13 @@
     });
   });
 
+  $('.finishbtn').click(function() {
+    var course, id;
+    id = $(this).attr('noteid');
+    course = $(this).attr('coursename');
+    return $.post('/' + course + '/' + id + '/done', function(d, st, xr) {
+      return console.log('Class dismissed');
+    });
+  });
+
 }).call(this);

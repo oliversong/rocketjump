@@ -1,9 +1,13 @@
 {% extends "layout.html" %}
 
 {% block body %}
-Welcome!
 <br />
 
+{% if unclosed %}
+	{% for unote in unclosed %}
+	    <div class="flash span12">Hey, are you done with this? <a href="{{ url_for('notepad', coursename=unote.course.name, noteid=unote.id) }}" target="_self">{{ unote.name }}</a> <button class='finishbtn' noteid='{{ unote.id }}' coursename='{{ unote.course.name }}'>Yep</button></div>
+	{% endfor %}
+{% endif %}
 <div class="profilePic" style="background-image:url({{ g.user.picurl }});"></div>
 
 <form action="{{ url_for('find') }}" method=post>
@@ -13,33 +17,33 @@ Welcome!
 
 <ul class="courses">
 	{% for course in g.user.courses %}
-	<li class='span3'>{{ course.name }}</li>
+		<li class='span3'><a href="{{ url_for('course', coursename=course.name) }}">{{ course.name }}</a></li>
 	{% else %}
-	<li class='span3'>No courses so far!</li>
+		<li class='span3'>No courses so far!</li>
 	{% endfor %}
 </ul>
 
 <ul class="notes">
 	{% for note in g.user.notes %}
-	<li class='span3'>{{ note.name + ' (' + note.date + ')' }}</li>
+		<li class='span3'><a href="{{ url_for('notepad', coursename=note.course.name, noteid=note.id) }}" target="_self">{{ note.name }}</a> </li>
 	{% else %}
-	<li class='span3'>No notes so far!</li>
+		<li class='span3'>No notes so far!</li>
 	{% endfor %}
 </ul>
 
 <ul class="collaborators">
 	{% for collaborator in collaborators %}
-	<li class='span3'>{{ collaborator.name }}</li>
+		<li class='span3'>{{ collaborator.name }}</li>
 	{% else %}
-	<li class='span3'>No collaborators yet!</li>
+		<li class='span3'>No collaborators yet!</li>
 	{% endfor %}
 </ul>
 
 <ul class="suggestions">
 	{% for course in suggested %}
-	<li class='span3'>{{ course.name }}</li>
+		<li class='span3'>{{ course.name }}</li>
 	{% else %}
-	<li class='span3'>No suggestions so far!</li>
+		<li class='span3'>No suggestions so far!</li>
 	{% endfor %}
 </ul>
 

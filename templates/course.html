@@ -5,11 +5,18 @@
 <br />
 
 {% if enrolled %}
-	{% if course.live %}
-		Class is in session right now!
-		<form action="{{ url_for('match', coursename=course.name) }}" method=get>
-			<input type=submit value="Jump in">
-		</form>
+	{% if live %}
+		{% if not unclosed %}
+			Class is in session right now!
+			<form action="{{ url_for('match', coursename=course.name) }}" method=get>
+				<input type=submit value="Jump in">
+			</form>
+		{% else %}
+			{% for unote in unclosed %}
+			    <div class="flash span12">Hey, are you done with this? <a href="{{ url_for('notepad', coursename=course.name, noteid=unote.id) }}" target="_self">{{ unote.name }}</a> <button class='finishbtn' noteid='{{ unote.id }}' coursename='{{ course.name }}'>Yep</button></div>
+			{% endfor %}
+		{% endif %}
+
 	{% else %}
 		<form action="{{ url_for('match', coursename=course.name) }}" method=get>
 			<input type=submit value="Begin class">
@@ -22,23 +29,44 @@
 	</form>
 {% endif %}
 <br />
+{% if enrolled %}
+	Your notes for this course
+	{% for unote in unotes %}
+		<a href="{{ url_for('notepad', coursename=course.name, noteid=unote.id) }}" target="_self">
+			<div class='note'>
+				{{ unote.name }}
+				{{ unote.date }}
+			</div>
+		</a>
+	{% else %}
+		No notes so far!
+	{% endfor %}
+{% endif %}
+
+<br />
 People who take this course
 {% for student in course.users %}
 	<div class='student'>
 		<div class="profilePic" style="background-image:url({{ student.picurl }});"></div>
 		{{ student.name }}
 	</div>
+{% else %}
+	Nobody takes this course yet!
 {% endfor %}
 
 Public notes
 {% for note in course.notes %}
 	{% if note.public %}
-		<div class='note'>
-			{{ note.name }}
-			{{ note.date }}
-			{{ note.users }}
-		</div>
+		<a href="{{ url_for('notepad', coursename=course.name, noteid=note.id) }}" target="_self">
+			<div class='note'>
+				{{ note.name }}
+				{{ note.date }}
+				{{ note.users }}
+			</div>
+		</a>
 	{% endif %}
+{% else %}
+	No public notes yet!
 {% endfor %}
 
 {% endblock %}

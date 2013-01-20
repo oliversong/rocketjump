@@ -7,5 +7,7 @@
 
 <iframe seamless='seamless' class='notepad' src="{{ note.url }}"></iframe>
 
-
+<form action="{{ url_for('done', coursename=note.course.name, noteid=note.id) }}" method=get>
+	<input type=submit value="Done">
+</form>
 {% endblock %}

@@ -11,3 +11,10 @@ $('.startClass').click ()->
 	$.get(pathname+'match',(d,st,xr)->
 		console.log("Boom")
 		)
+
+$('.finishbtn').click ()->
+	id = $(this).attr('noteid')
+	course = $(this).attr('coursename')
+	$.post('/'+course+'/'+id+'/done',(d,st,xr)->
+		console.log('Class dismissed')
+		)

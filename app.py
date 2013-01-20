@@ -27,7 +27,7 @@ FACEBOOK_APP_ID = '124499577716801'
 FACEBOOK_APP_SECRET = '8f3dc21d612f5ef19dbc98221e1c7a0d'
 
 # etherpad api connection
-apiKey = "1zt8snBRk4XG242X4KfSOc0tcQSxH4vs"
+apiKey = "qSoNop1JjHxPQcJkv3L5rrmgBrqNgC1t"
 pad = EtherpadLiteClient(apiKey,'http://0.0.0.0:9001/api')
 
 # make app
@@ -103,6 +103,7 @@ class User(db.Model):
     notes = db.relationship('Note', secondary=noteTable, backref=db.backref('users', lazy='dynamic'))
     queues = db.relationship('Queue', secondary=queueTable, backref=db.backref('users', lazy='dynamic'))
     authorID = db.Column(db.String(120), unique=True)
+    sessionID = db.Column(db.String(120))
 
     def __init__(self, fid, name, email, username):
         self.fid = fid
@@ -165,6 +166,8 @@ class Note(db.Model):
     lecture_id = db.Column(db.Integer, db.ForeignKey('lectures.id'))
     public = db.Column(db.Boolean, default=False)
     url = db.Column(db.String(300))
+    inProgress = db.Column(db.Boolean, default=False)
+    liveCount = db.Column(db.Integer)
 
     def __init__(self, date, lecture, course, users):
         self.date = date
@@ -172,6 +175,7 @@ class Note(db.Model):
         self.course = course
         self.name = self.course.name + date
         self.users = users
+        self.liveCount = 0
 
 
     def __repr__(self):
@@ -316,22 +320,24 @@ def logout():
 
 @app.route('/home/')
 def home():
-    if 'fid' in session:
-        curuser = db.session.query(User).from_statement(
-            "SELECT * FROM users where fid=:user_id").\
-            params(user_id=session['fid']).all()[0]
-    else:
+    if 'fid' not in session:
         flash('Please sign in.')
         return redirect(url_for('index'))
     collabs=[]
-    curnotes = curuser.notes
-    for note in curuser.notes:
+    curnotes = g.user.notes
+    for note in g.user.notes:
         for user in note.users:
             if user != g.user:
-                collabs.append(user)
+                if user not in collabs:
+                    collabs.append(user)
     query = db.session.query(Course).order_by(desc(Course.count)).limit(3)
     suggested = query.all()
-    return render_template('home.html', collaborators=collabs, suggested=suggested)
+    # check for live notes
+    unclosed=[]
+    for x in g.user.notes:
+        if x.inProgress:
+            unclosed.append(x)
+    return render_template('home.html', collaborators=collabs, suggested=suggested, unclosed=unclosed)
 
 @app.route('/find', methods=['POST'])
 def find():
@@ -352,16 +358,15 @@ def course(coursename):
     courseobj = db.session.query(Course).filter(Course.name == coursename).all()
     if len(courseobj)==0:
         flash('No courses found by that name.')
-        redirect(url_for('home'))
+        raise Exception("what??")
+        return redirect(url_for('home'))
     elif len(courseobj)>1:
         raise Exception('More than one course by that name...uh oh.')
     else:
         if request.method == 'POST':
             if 'fid' not in session:
                 abort(401)
-            curuser = db.session.query(User).get(g.user.id)
-            curcourse = db.session.query(Course).get(courseobj[0].id)
-            curuser.courses.append(curcourse)
+            g.user.courses.append(courseobj[0])
             db.session.commit()
             enrolled = True
         else:
@@ -369,7 +374,19 @@ def course(coursename):
                 enrolled = True
             else:
                 enrolled = False
-    return render_template('course.html', course=courseobj[0], enrolled=enrolled)
+        unotes = []
+        unclosed=[]
+        for x in g.user.notes:
+            if x.course == courseobj[0]:
+                if x.inProgress:
+                    unclosed.append(x)
+                unotes.append(x)
+        live = False
+        for lec in courseobj[0].lectures:
+            if lec.live:
+                live = True
+
+    return render_template('course.html', course=courseobj[0], enrolled=enrolled, unclosed=unclosed, unotes=unotes, live=live)
 
 @app.route('/<coursename>/match')
 def match(coursename):
@@ -378,54 +395,64 @@ def match(coursename):
 
     user = db.session.query(User).filter(User.fid == session['fid']).first()
     courseobj = db.session.query(Course).filter(Course.name == coursename).first()
-    #raise Exception("hi")
     liveLectures = filter(lambda lecture: lecture.live == True, courseobj.lectures)
-
+    print "hi"
     if len(liveLectures) == 0:
-        # course isn't live
+        print "course isn't live"
 
         # new lecture, new note
         newLecture = createLecture(user, courseobj)
         newNote = createPad(user, courseobj, newLecture)
 
         # make lecture live
+        newNote.inProgress = True
         newLecture.live = True
         db.session.commit()
+        newNote.liveCount += 1
 
-        sessionID = pad.createSession(newNote.lecture.groupID, user.authorID, int(time.time()+86400))['sessionID']
-        response = make_response(redirect(url_for('notepad', coursename=courseobj.name, noteid=newNote.id)))
-        response.set_cookie('sessionID',sessionID, domain=".notability.org")
-
-        return response
+        sessionID = pad.createSession(newNote.lecture.groupID, user.authorID, int(time.time() + 86400))['sessionID']
+        user.sessionID = sessionID
+        db.session.commit()
+        return redirect(url_for('notepad', coursename=courseobj.name, noteid=newNote.id))
 
     elif len(liveLectures) == 1:
-        # course is live
-        # do matchmaking, but there may not actually be a match
+        print "course is live"
+        # user may already be in an unclosed note
+        if liveLectures[0] in user.lectures:
+            for x in user.notes:
+                if x.inProgress and x in liveLectures[0].notes:
+                    print "this user has an unclosed note"
+                    return redirect(url_for('notepad', coursename=courseobj.name, noteid=x.id))
+
+        # user isn't in a note
         matchedUser = matchmake(liveLectures[0])
         if matchedUser != None:
-            # there is a user waiting; pair them up
-            # remove other user from queue
+            # user waiting; pair up; remove other user from queue
+            print 'user waiting'
             liveLectures[0].queue.users.remove(matchedUser)
-            # add current user to note
             note = matchedUser.notes[-1]
             user.notes.append(note)
+            note.liveCount += 1
             db.session.commit()
             # everyone who is on the queue should already be in a pad, so just redirect the person to their note url
             sessionID = pad.createSession(note.lecture.groupID, user.authorID, int(time.time()+86400))['sessionID']
-            response = make_response(redirect(url_for('notepad', coursename=courseobj.name, noteid=note.id)))
-            response.set_cookie('sessionID',sessionID, domain=".notability.org")
+            user.sessionID = sessionID
+            db.session.commit()
+            return redirect(url_for('notepad', coursename=courseobj.name, noteid=note.id))
 
-            return response
         else:
             # there is no user waiting; everyone is paired up
             # lecture already exists; create note and put user in it
+            print 'no user waiting'
             newNote = createPad(user,courseobj,liveLectures[0])
+            newNote.inProgress = True
+            newNote.liveCount += 1
             db.session.commit()
             sessionID = pad.createSession(newNote.lecture.groupID, user.authorID, int(time.time()+86400))['sessionID']
-            response = make_response(redirect(url_for('notepad', coursename=courseobj.name, noteid=newNote.id)))
-            response.set_cookie('sessionID',sessionID, domain=".notability.org")
+            user.sessionID = sessionID
+            db.session.commit()
+            return redirect(url_for('notepad', coursename=courseobj.name, noteid=newNote.id))
 
-            return response
     else:
         # dafuq
         abort(401)
@@ -438,7 +465,29 @@ def notepad(coursename, noteid):
     note = db.session.query(Note).filter(Note.id == noteid).first()
     if note not in user.notes:
         abort(401)
-    return render_template('notepad.html',note=note)
+    response = make_response(render_template('notepad.html',note=note))
+    response.set_cookie('sessionID',user.sessionID, domain=".notability.org")
+    return response
+
+@app.route('/<coursename>/<int:noteid>/done', methods=['GET','POST'])
+def done(coursename, noteid):
+    note = db.session.query(Note).filter(Note.id == noteid).first()
+    if note not in g.user.notes:
+        abort(401)
+    note.liveCount -= 1
+    if note.liveCount == 0:
+        note.inProgress = False
+    result = False
+    for blah in note.lecture.notes:
+        if blah.inProgress:
+            result = True
+    note.lecture.live = result
+    db.session.commit()
+    if request.method == 'GET':
+        return redirect(url_for('home'))
+    else:
+        return 'done'
+
 
 
 @app.route('/about/')
