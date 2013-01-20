@@ -31,7 +31,7 @@ apiKey = "qSoNop1JjHxPQcJkv3L5rrmgBrqNgC1t"
 # local
 # pad = EtherpadLiteClient(apiKey,'http://0.0.0.0:9001/api')
 # remote
-pad = EtherpadLiteClient(apiKey,'http://goombastomp.cloudfoundry.com/')
+pad = EtherpadLiteClient(apiKey,'http://goombastomp.cloudfoundry.com/api')
 
 # make app
 app = Flask(__name__)
