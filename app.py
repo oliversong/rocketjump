@@ -358,7 +358,6 @@ def course(coursename):
     courseobj = db.session.query(Course).filter(Course.name == coursename).all()
     if len(courseobj)==0:
         flash('No courses found by that name.')
-        raise Exception("what??")
         return redirect(url_for('home'))
     elif len(courseobj)>1:
         raise Exception('More than one course by that name...uh oh.')
