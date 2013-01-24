@@ -29,16 +29,16 @@ FACEBOOK_APP_SECRET = '8f3dc21d612f5ef19dbc98221e1c7a0d'
 # etherpad api connection
 apiKey = "qSoNop1JjHxPQcJkv3L5rrmgBrqNgC1t"
 # local
-# pad = EtherpadLiteClient(apiKey,'http://0.0.0.0:9001/api')
+pad = EtherpadLiteClient(apiKey,'http://0.0.0.0:9001/api')
 # remote
-pad = EtherpadLiteClient(apiKey,'http://goombastomp.cloudfoundry.com/api')
+#pad = EtherpadLiteClient(apiKey,'http://goombastomp.cloudfoundry.com/api')
 
 # make app
 app = Flask(__name__)
 #heroku
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
+#app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
 #local
-#app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/rocketjumpdb'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/rocketjumpdb'
 app.debug = DEBUG
 app.secret_key = SECRET_KEY
 oauth = OAuth()
@@ -333,8 +333,11 @@ def home():
             if user != g.user:
                 if user not in collabs:
                     collabs.append(user)
-    query = db.session.query(Course).order_by(desc(Course.count)).limit(3)
-    suggested = query.all()
+    possCourses= db.session.query(Course).order_by(desc(Course.count)).limit(3).all()
+    suggested = []
+    for c in possCourses:
+        if g.user not in c.users:
+            suggested.append(c) 
     # check for live notes
     unclosed=[]
     for x in g.user.notes:

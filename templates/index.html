@@ -1,6 +1,182 @@
 {% extends "layout.html" %}
 
 {% block body %}
-Welcome to Notability
-<br />
+<div class="showcase">
+	<div class="container">
+		<div class="row welcome">
+			<div class="row">
+				<div class="span12 hello">
+					<h1>Mix it up. Take notes. Connect.</h1>
+					<h1>Meet somebody new in class today.</h1>
+				</div>
+			</div>
+			<div class="row herp">
+				<a href="{{ url_for('login') }}">
+					<div class="span2 getStarted"></div>
+				</a>
+				<div class="span1 smallOr">
+					or
+				</div>
+				<a href="{{ url_for('about') }}">
+					<div class="span2 learnMore">	
+						Learn more
+					</div>
+				</a>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="orangebar"></div>
+<div class="collabcontain">
+	<div class="container">
+		<div class="row collab">
+			<div class="span6 collabimg"></div>
+			<div class="span6 collablabel">
+				<div class="row">
+					<div class="span6">
+						<h2 style="margin:0px;">Real time collaboration</h2>
+						<h3 style="margin-top:0px;">Simple, reliable and fast note syncing</h3>
+					</div>
+				</div>
+				<div class="row">
+					<div class="span6 midtext">
+						Built on Node.js and Socket.io, we sync all your notes live with your partner. With Notability, chat, multitasking, and upload syncing is a piece of cake. Don't worry about saving; every time you type, the entire document is updated server side, so everybody always has the full copy.
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="matchcontain">
+	<div class="container">
+		<div class="row matching">
+			<div class="span6 matchinglabel">
+				<div class="row">
+					<div class="span6">
+						<h2 style="margin:0px;">Intelligent Matching</h2>
+						<h3 style="margin-top:0px;">Algorithmic preference-based match-finding</h3>
+					</div>
+				</div>
+				<div class="row">
+					<div class="span6 midtext">
+						Built on Node.js and Socket.io, we sync all your notes live with your partner. With Notability, chat, multitasking, and upload syncing is a piece of cake. Don't worry about saving; every time you type, the entire document is updated server side, so everybody always has the full copy.
+					</div>
+				</div>
+			</div>
+			<div class="span6 matchingimg"></div>
+		</div>
+	</div>
+</div>
+<div class="analyticscontain">
+	<div class="container analytics">
+		<div class="row analytics1">
+			<div class="span12 analyticslabel">
+				<h2 style="margin:0px;">Lightning-fast Analytics</h2>
+				<h3 style="margin-top:0px;">Track multiple lecture metrics live</h3>
+			</div>
+		</div>
+		<div class="row analytics2">
+			<div class="span12 midtext">
+				Built on Node.js and Socket.io, we sync all your notes live with your partner. With Notability, chat, multitasking, and upload syncing is a piece of cake. Don't worry about saving; every time you type, the entire document is updated server side, so everybody always has the full copy.
+			</div>
+		</div>
+		<div class="row anayltics3" style="margin-top:30px">
+			<div class="span12 analyticsimg"></div>
+		</div>
+	</div>
+</div>
+<div class="howitcontain">
+	<div class="container howit">
+		<div class="row howit1">
+			<div class="span12 howitlabel">
+				<h2 style="margin:0px;">How does it work?</h2>
+				<h3 style="margin-top:0px;">Expand your network in 4 easy steps.</h3>
+			</div>
+		</div>
+		<div class="row howit2">
+			<div class="span12 midtext">
+				Built on Node.js and Socket.io, we sync all your notes live with your partner. With Notability, chat, multitasking, and upload syncing is a piece of cake. Don't worry about saving; every time you type, the entire document is updated server side, so everybody always has the full copy.
+			</div>
+		</div>
+		<div class="row howit3" style="margin-top:30px">
+			<div class="span3">
+				<div class="row">
+					<div class="span3">
+						<h2>Enroll in a class</h2>
+					</div>
+				</div>
+				<div class="row">
+					<div class="span3 imgstep1">
+					</div>
+				</div>
+				<div class="row">
+					<div class="span3">
+						Once you've signed in, simply find a class through the search bar (or one of the classes we've found based on your friends!) and click the enroll button.
+					</div>
+				</div>
+			</div>
+			<div class="span3">
+				<div class="row">
+					<div class="span3">
+						<h2>Roll a partner</h2>
+					</div>
+				</div>
+				<div class="row">
+					<div class="span3 imgstep2">
+					</div>
+				</div>
+				<div class="row">
+					<div class="span3">
+						After enrolling, if you want to start immediately, you can join in the current lecture. Now you'll be redirected to your collaborative notepad!
+					</div>
+				</div>
+			</div>
+			<div class="span3">
+				<div class="row">
+					<div class="span3">
+						<h2>Take some notes</h2>
+					</div>
+				</div>
+				<div class="row">
+					<div class="span3 imgstep3">
+					</div>
+				</div>
+				<div class="row">
+					<div class="span3">
+						Now that you're in a notepad, you can start taking notes. Once your partner joins, you're in business! Also, if you prefer, you can also reroll.
+					</div>
+				</div>
+			</div>
+			<div class="span3">
+				<div class="row">
+					<div class="span3">
+						<h2>Meet a new friend</h2>
+					</div>
+				</div>
+				<div class="row">
+					<div class="span3 imgstep4">
+					</div>
+				</div>
+				<div class="row">
+					<div class="span3">
+						Congratulations! You've made a set of lectures notes that you can publish to your friends, and (more importantly) a new buddy.
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="wellcontain">
+	<div class="container wellwhat">
+		<div class="row">
+			<div class="span5 offset2 welloffset">
+				<h1 style="margin:0px;">What are you waiting for?</h1>
+			</div>
+			<a href="{{ url_for('login') }}">
+				<div class="span2 getStarted movebtn">
+				</div>
+			</a>
+		</div>
+	</div>
+</div>
 {% endblock %}

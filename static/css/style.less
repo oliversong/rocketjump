@@ -1,17 +1,319 @@
-@linkColor: #000;
+@font-face
+{
+    font-family: 'Edelsans';
+    src: url('edelsans_regular.otf');
+}
+@font-face
+{
+    font-family: 'EdelsansUL';
+    src: url('edelsans_ultralight.otf');
+}
+
+@bodyBackground: #F6F5F2;
+@linkColor: #CCC;
 @import "less/mixins.less";
 @pink: #be1a8d;
 @picback: #CCC;
+@sansFontFamily: 'Open Sans', sans-serif;
+@orange: #ff9a09;
+@white: #f6f5f2;
+@beigewhite: #f6f2e3;
+@beigewhite2: #eae5d5;
+@smallco: #c6c6c6;
+@baseFontSize: 13px;
+@baseLineHeight: 18px;
+@headingsFontWeight: normal;
+
+/****** RETINA *************
+****************************/
+
+.at2x(@path, @w: auto, @h: auto) {
+  background-image: url(@path);
+  @at2x_path: ~`"@{path}".split('.').slice(0, "@{path}".split('.').length - 1).join(".") + "@2x" + "." + "@{path}".split('.')["@{path}".split('.').length - 1]`;
+
+  @media all and (-webkit-min-device-pixel-ratio : 1.5) {
+    background-image: url(@at2x_path);
+    background-size: @w @h;
+  }  
+}
+body{
+    text-shadow:0 -1px 0 #FFF;
+}
+a{
+    text-decoration:none !important;
+}
+
+h1{
+    font-size: 2.5em;
+    font-family: 'Edelsans';
+}
+
+h2{
+    font-size:1.5em;
+    font-family: 'Edelsans';
+    line-height:1.5em;
+}
+
+h3{
+    font-size:1.5em;
+    font-family: 'EdelsansUL';
+    line-height:1.5em;
+}
+
+h4{
+    font-size:1em;
+    font-family: 'Open Sans';
+    font-weight: 600;
+    line-height:1em;
+}
+
+small{
+    font-size: 0.85em;
+    line-height: 0.85em;
+    font-family: 'Open Sans';
+}
+
+header{
+    background-color: #FFF;
+    opacity: 0.91;
+    height:60px;
+    width:100%;
+    box-shadow: 0px 0px 3px rgba(50, 50, 50, 0.75);
+}
+footer{
+    border-top:1px solid #ccc7c0;
+    background-color:#f3efe2;
+    height:148px;
+    width:100%;
+    vertical-align: middle;
+    color:#c6c6c6;
+    text-align:center;
+}
+.atleast{
+    min-height:600px;
+}
+.rocketjump{
+    margin-top:100px;
+    .at2x('../img/about.png', 600px, 157px);
+    width:600px;
+    height:157px;
+}
+.pushdown{
+    margin-top:17px;
+}
+.copyright{
+    float:right;
+}
+.wellcontain{
+    background-color:#f3efe2;
+    width:100%;
+    height:auto;
+    text-align:right;
+}
+.wellwhat{
+    padding-top:80px;
+    padding-bottom:10px;
+}
+.welloffset{
+    padding-left:20px;
+}
+.movebtn{
+    margin-top:-10px;
+}
+.inheader{
+    opacity: 1;
+    margin-top: 9px;
+}
+.signin{
+    border-radius:4px;
+    background-color: none;
+    border:2px solid;
+    border-color:#d0d0d0;
+    width:72px;
+    height:25px;
+    text-align:center;
+    font-family:'Open Sans', sans-serif;
+    font-size:14px;
+    color:#b1b0b0;
+    line-height:25px;
+    -webkit-transition: color .08s linear, border-color .08s linear;
+    margin-top:11px;
+    float:right;
+}
+.signin:hover{
+    border-color:#999;
+    color:#888;
+    cursor:pointer;
+    -webkit-transition: color .08s linear, border-color .08s linear;
+}
+.signin:active{
+    border-color:#666;
+    color:#666;
+    cursor:pointer;
+    margin-top:12px;
+    -webkit-transition: color 0s linear, border-color 0s linear;
+}
+@media (max-width:767px){
+    .signin{
+        margin-top:-33px;
+    }
+}
+
+.logo{
+    .at2x('../img/logo.png',127px, 48px);
+    height:48px;
+    background-repeat:no-repeat;
+}
 
 .profilePic{
-	position:relative;
-	width:200px;
-	height:200px;
-	background-color:@picback;
-	background-repeat:no-repeat;
+    position:relative;
+    width:200px;
+    height:200px;
+    background-color:@picback;
+    background-repeat:no-repeat;
 }
 .notepad{
-	width:100%;
-	height:100%;
-	min-height:400px;
+    width:100%;
+    height:100%;
+    min-height:400px;
+}
+
+.showcase{
+    .at2x('../img/showcase.jpg',100%,516px);
+    background: transparent no-repeat center 40%;
+    width:100%;
+    height:516px;
+    background-size:cover!important;
+    margin-top:-60px;
+}
+.nopad{
+    padding:0px;
+}
+.welcome{
+    margin-top:200px;
+    margin-left:0px;
+}
+.hello{
+    color:#f5f5f5;
+    text-shadow:0 1px 0 #333;
+}
+.getStarted{
+    .at2x('../img/startbtn.png',144px,47px);
+    width:141px;
+    height:47px;
+    background-position:top;
+    background-size:141px 146px !important;
+}
+.getStarted:hover{
+    background-position:0 97px;
+}
+.getStarted:active{
+    background-position:0 49px;
+}
+.learnMore{
+    border-radius:4px;
+    background-color: none;
+    border:2px solid;
+    border-color:#DDD;
+    width:136px;
+    height:39px;
+    text-align:center;
+    font-family:'Open Sans', sans-serif;
+    font-size:20px;
+    color:#DDD;
+    line-height:39px;
+    -webkit-transition: color .07s linear, border-color .07s linear;
+    margin-top:1px;
+    text-shadow:0 -1px 0 #444;
+}
+.learnMore:hover{
+    border-color:#f7f5f2;
+    color:#f7f5f2;
+    cursor:pointer;
+    -webkit-transition: color .07s linear, border-color .07s linear;
+}
+.learnMore:active{
+    border-color:#666;
+    color:#666;
+    cursor:pointer;
+    margin-top:2px;
+    -webkit-transition: color 0s linear, border-color 0s linear;
+}
+.smallOr{
+    color:#f7f5f2;
+    font-size:13px;
+    text-align:center;
+    margin-top:15px;
+    text-shadow:0 -1px 0 #000;
+    width:20px;
+}
+.herp{
+    margin-top:8px;
+}
+.orangebar{
+    height:4.5px;
+    width:100%;
+    background-color:#ff9a09;
+}
+.collabcontain{
+    width:100%;
+    height:auto;
+}
+.collab, .matching{
+    margin-top:100px;
+    margin-bottom:100px;
+}
+.collabimg{
+    .at2x('../img/macbookair.png',575px,305px);
+    height:305px;
+    background-repeat:no-repeat;
+    background-position:center center;
+    background-size:contain;
+}
+.collablabel, .matchinglabel{
+    vertical-align: middle;
+    margin-top:60px;
+}
+.matchcontain{
+    background-color:#ede9de;
+    width:100%;
+    height:auto;
+}
+.matchingimg{
+    background-color:@orange;
+    height:305px;
+}
+.midtext{
+    font-size:16px;
+}
+.analytics{
+    padding-top:50px;
+    text-align:center;
+}
+.analyticscontain{
+    background-color:#e4e1d6;
+    height:auto;
+    width:100%;
+}
+.analyticsimg{
+    .at2x('../img/macbookpro.png',1016px,356px);
+    height:356px;
+    background-repeat:no-repeat;
+    background-position:center bottom;
+    background-size:contain;
+}
+.howitcontain{
+    background-color:#eae5d5;
+    width:100%;
+    height:auto;
+}
+.howit{
+    text-align:center;
+    padding-top:50px;
+    padding-bottom:50px;
+}
+.imgstep1, .imgstep2, .imgstep3, .imgstep4{
+    height:150px;
+    background-color:@orange;
+    margin-bottom:15px;
 }

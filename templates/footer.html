@@ -1,8 +1,15 @@
-<div class="row">
-    <div class="span4 offset4">
-        <ul class="foot">
-            <li><a href="{{ url_for('home') }}">Home</a></li>
-            <li><a href="{{ url_for('about') }}">About</a></li>
-        </ul>
-    </div>
-</div>
+<footer> 
+	<div class="container" style="padding-top:70px">
+		<div class="row">
+		    <a href="{{ url_for('index') }}">
+		        <div class="span2 logo"></div>
+		    </a>
+		    <div class="span4 offset2 pushdown">
+				<a href="{{url_for('home')}}">Home</a>  |  <a href="{{url_for('login')}}">Sign in</a>  |  <a href="{{url_for('about')}}">About</a>  |  <a href="mailto:osong@mit.edu?Subject=Hello!">Contact</a>
+		    </div>
+		    <div class="span2 offset2 pushdown">
+		    	<text class="copyright">© 2013 Notability</text>
+		    </div>
+		</div>
+	</div>
+</footer>

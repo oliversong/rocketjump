@@ -30,4 +30,8 @@
     });
   });
 
+  if (window.location.pathname === "/") {
+    $('footer').css('border', 'none');
+  }
+
 }).call(this);

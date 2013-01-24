@@ -18,3 +18,6 @@ $('.finishbtn').click ()->
 	$.post('/'+course+'/'+id+'/done',(d,st,xr)->
 		console.log('Class dismissed')
 		)
+
+if window.location.pathname=="/"
+	$('footer').css('border','none')
