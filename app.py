@@ -48,7 +48,7 @@ app.config.from_object(__name__)
 def initdb():
     db.drop_all()
     db.create_all()
-    newCourse = Course('6.470', '10-250', 'Oliver Song', 'osong@mit.edu', '6.470 is awesome!')
+    newCourse = Course('6.470 - Web Programming Competition', '10-250', 'Oliver Song', 'osong@mit.edu', '6.470 is awesome!')
     db.session.add(newCourse)
     db.session.commit()
 
@@ -98,25 +98,31 @@ class User(db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
     fid = db.Column(db.BigInteger, unique=True)
-    name = db.Column(db.String(80))
+    fname = db.Column(db.String(80))
+    lname = db.Column(db.String(80))
     email = db.Column(db.String(120), unique=True)
     picurl = db.Column(db.String(120))
+    spicurl = db.Column(db.String(120))
     courses = db.relationship('Course', secondary=courseTable, backref=db.backref('users', lazy='dynamic'))
     lectures = db.relationship('Lecture', secondary=lectureTable, backref=db.backref('users', lazy='dynamic'))
     notes = db.relationship('Note', secondary=noteTable, backref=db.backref('users', lazy='dynamic'))
     queues = db.relationship('Queue', secondary=queueTable, backref=db.backref('users', lazy='dynamic'))
     authorID = db.Column(db.String(120), unique=True)
     sessionID = db.Column(db.String(120))
+    college = db.Column(db.String(120))
 
-    def __init__(self, fid, name, email, username):
+    def __init__(self, fid, fname, lname, email, username, college):
         self.fid = fid
-        self.name = name
+        self.fname = fname
+        self.lname = lname
         self.email = email
         self.picurl = "http://graph.facebook.com/"+username+"/picture?width=200&height=200"
-        self.authorID = pad.createAuthorIfNotExistsFor(fid,name)['authorID']
+        self.spicurl = "https://graph.facebook.com/"+username+"/picture?type=square"
+        self.authorID = pad.createAuthorIfNotExistsFor(fid,fname+' '+lname)['authorID']
+        self.college = college
 
     def __repr__(self):
-        return '<Name %r>' % self.name
+        return '<Name %r>' % self.fname+' '+self.lname
 
 class Course(db.Model):
     __tablename__ = 'courses'
@@ -176,7 +182,7 @@ class Note(db.Model):
         self.date = date
         self.lecture = lecture
         self.course = course
-        self.name = self.course.name + date
+        self.name = 'Unnamed'
         self.users = users
         self.liveCount = 0
 
@@ -300,8 +306,12 @@ def facebook_authorized(resp):
     me = facebook.get('/me')
     checkUser = db.session.query(User).filter(User.fid==me.data['id']).all()
     if not checkUser:
-
-        newuser = User(me.data['id'],me.data['name'],me.data['email'],me.data['username'])
+        fname = me.data['name'].split()[0]
+        lname = me.data['name'].split()[-1]
+        education='Massachusetts Institute of Technology (MIT)'
+        if 'education' in me.data:
+            education=me.data['education'][-1]['school']['name']
+        newuser = User(me.data['id'], fname, lname, me.data['email'], me.data['username'], education)
         db.session.add(newuser)
         db.session.commit()
     flash('You were logged in')
@@ -320,6 +330,13 @@ def logout():
     resp = make_response(redirect(url_for('index')))
     resp.set_cookie('sessionID', '', expires=0, domain='.notability.org')
     return resp
+
+@app.route('/settings/')
+def settings():
+    if 'fid' not in session:
+        flash('Please sign in.')
+        return redirect(url_for('index'))
+    return render_template('settings.html')
 
 @app.route('/home/')
 def home():
@@ -390,8 +407,12 @@ def course(coursename):
         for lec in courseobj[0].lectures:
             if lec.live:
                 live = True
+        noPublic=True
+        for y in courseobj[0].notes:
+            if y.public:
+                noPublic==False
 
-    return render_template('course.html', course=courseobj[0], enrolled=enrolled, unclosed=unclosed, unotes=unotes, live=live)
+    return render_template('course.html', course=courseobj[0], enrolled=enrolled, unclosed=unclosed, unotes=unotes, live=live, noPublic=noPublic)
 
 @app.route('/<coursename>/match')
 def match(coursename):
@@ -468,8 +489,12 @@ def notepad(coursename, noteid):
         abort(401)
     user = db.session.query(User).filter(User.fid == session['fid']).first()
     note = db.session.query(Note).filter(Note.id == noteid).first()
+    note.inProgress = True
+    note.lecture.live = True
+    db.session.commit()
     if note not in user.notes:
-        abort(401)
+        flash("Sorry, you're not part of that note!")
+        redirect(url_for('home'))
     response = make_response(render_template('notepad.html',note=note))
     response.set_cookie('sessionID',user.sessionID, domain=".notability.org")
     return response
@@ -493,7 +518,12 @@ def done(coursename, noteid):
     else:
         return 'done'
 
-
+@app.route('/<coursename>/<int:noteid>/new', methods=['POST'])
+def updateName(coursename,noteid):
+    note = db.session.query(Note).filter(Note.id == noteid).first()
+    note.name=request.form['newval']
+    db.session.commit()
+    return 'done'
 
 @app.route('/about/')
 def about():

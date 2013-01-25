@@ -5,10 +5,8 @@ Ruby is too confusing.
 ==============
 
 ### TODO
-* Initialize db with all MIT courses info
-* Implement lecture wide assets
-* Real design
-* Implement design
+* Dataset 
+* Lecture wide assets
 * Analytics
 	* How many people are queued
 	* How many people are taking notes
@@ -27,3 +25,5 @@ Ruby is too confusing.
 4. Finish up functionality of pages/views
 5. Fix fileupload plugin
 6. Fix bugs to do with note handling
+7. Real design
+8. Implement design

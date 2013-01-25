@@ -8,7 +8,6 @@
       placeholder: 'hello'
     };
     return $.post(pathname, data, function(d, st, xr) {
-      console.log("Successfully enrolled");
       return $('.enroll').remove();
     });
   });
@@ -17,7 +16,7 @@
     var pathname;
     pathname = window.location.pathname;
     return $.get(pathname + 'match', function(d, st, xr) {
-      return console.log("Boom");
+      return $.noop();
     });
   });
 
@@ -26,9 +25,22 @@
     id = $(this).attr('noteid');
     course = $(this).attr('coursename');
     return $.post('/' + course + '/' + id + '/done', function(d, st, xr) {
-      return console.log('Class dismissed');
+      return $.noop();
     });
   });
+
+  /$('.noteName').click()->blah=$(this).text()id=$(this).attr('noteid')course=$(this).attr('coursename')$(this).replaceWith('''<spanclass="replaceme"><inputtype="text"class="nameReplace"name="nameReplace"placeholder="'''+blah+'''"\/><buttonclass="btnbtn-warningupdateName">Update<\/button><\/span>''')$('.updateName').click()->newName=$('.nameReplace').val()$.post('\/'+course+'\/'+id+'\/updateName',{name:newName},(d,st,xr)->$('.replaceme'))/;
+
+
+  window.inplace = function(content) {
+    var path;
+    path = window.location.pathname;
+    return $.post(path + '/new', {
+      newval: content
+    }, function(d, st, xr) {
+      return $.noop();
+    });
+  };
 
   if (window.location.pathname === "/") {
     $('footer').css('border', 'none');

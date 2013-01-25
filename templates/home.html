@@ -1,50 +1,111 @@
 {% extends "layout.html" %}
 
 {% block body %}
-<br />
+<div class="showcase2">
+	<div class="container">
+		<div class="row welcome">
+			<div class="span12 hello textcenter">
+				<h1>Welcome back, {{ g.user.fname }}!</h1>
+			</div>
+		</div>
+		<div class="row noleftmargin">
+			<form action="{{ url_for('find') }}" method=post>
+				<div class="span5 offset3">
+					<input class="span5 search" placeholder="Find a class" type=text name=courseName>
+				</div>	
+				<input class="span2 searchbtn" type=submit value=''>
+			</form>
+		</div>
+	</div>
+</div>
+<div class="orangebar"></div>
+<div class="uppercontain">
+	<div class="container">
+		<div class="row">
+			<div class="span2 profilePic" style="background-image:url({{ g.user.picurl }});"></div>
+			<div class="span3 userstats">
+				<div style="margin-top:5px;font-size:1.5em;font-family:Edelsans;">{{ g.user.fname }} {{ g.user.lname }}</div>
+				{{ g.user.college }}<br />
+				{{ g.user.courses|count }} Courses<br />
+				{{ g.user.notes|count }} Notes<br />
+				{{ collaborators|count }} Collaborators
+			</div>
+	</div>
+</div>
+<div class="lowercontain">
+	<div class="container">
+        {% for message in get_flashed_messages() %}
+            <div class="alert"><button type="button" class="close" data-dismiss="alert">&times;</button>{{ message }}</div>
+        {% endfor %}
+		{% if unclosed %}
+			{% for unclosednote in unclosed %}
+			    <div class="alert alert-info">
+			    	<button type="button" class="close" data-dismiss="alert">&times;</button>Hey, are you done with this? <a href="{{ url_for('notepad', coursename=unclosednote.course.name, noteid=unclosednote.id) }}" target="_self">{{ unclosednote.name }}</a> <button class='finishbtn' noteid='{{ unclosednote.id }}' coursename='{{ unclosednote.course.name }}'>Yep</button>
+			    </div>
+			{% endfor %}
+		{% else %}
+			{% if suggested %}
+				{% for course in suggested %}
+					<div class='alert alert-info'>
+						<button type="button" class="close" data-dismiss="alert">&times;</button>Hey! Some of your friends are in '{{ course.name }}'. Are you also in this course? <button>Yes</button>
+					</div>
+				{% endfor %}
+			{% endif %}
+		{% endif %}
 
-{% if unclosed %}
-	{% for unote in unclosed %}
-	    <div class="flash span12">Hey, are you done with this? <a href="{{ url_for('notepad', coursename=unote.course.name, noteid=unote.id) }}" target="_self">{{ unote.name }}</a> <button class='finishbtn' noteid='{{ unote.id }}' coursename='{{ unote.course.name }}'>Yep</button></div>
-	{% endfor %}
-{% endif %}
-<div class="profilePic" style="background-image:url({{ g.user.picurl }});"></div>
-
-<form action="{{ url_for('find') }}" method=post>
-	<input type=text name=courseName size=120>
-	<input type=submit value='Find'>
-</form>
-
-<ul class="courses">
-	{% for course in g.user.courses %}
-		<li class='span3'><a href="{{ url_for('course', coursename=course.name) }}">{{ course.name }}</a></li>
-	{% else %}
-		<li class='span3'>No courses so far!</li>
-	{% endfor %}
-</ul>
-
-<ul class="notes">
-	{% for note in g.user.notes %}
-		<li class='span3'><a href="{{ url_for('notepad', coursename=note.course.name, noteid=note.id) }}" target="_self">{{ note.name }}</a> </li>
-	{% else %}
-		<li class='span3'>No notes so far!</li>
-	{% endfor %}
-</ul>
-
-<ul class="collaborators">
-	{% for collaborator in collaborators %}
-		<li class='span3'>{{ collaborator.name }}</li>
-	{% else %}
-		<li class='span3'>No collaborators yet!</li>
-	{% endfor %}
-</ul>
-
-<ul class="suggestions">
-	{% for course in suggested %}
-		<li class='span3'>{{ course.name }}</li>
-	{% else %}
-		<li class='span3'>No suggestions so far!</li>
-	{% endfor %}
-</ul>
+		<div class="row">
+			<div class="span6 pushdown">
+				<text class="courseheader">Current courses</text>
+					{% for course in g.user.courses %}
+						<a href="{{ url_for('course', coursename=course.name) }}">
+							<div class='coursetab'>
+								<div class="tabheader">{{ course.name }}</div>
+								<div>
+									{{ course.users.all()|count }} people taking this course:
+								</div>
+								<div style='margin-top:5px'>
+									{% for dupe in course.users %}
+										<img src='{{ dupe.spicurl }}' class="smallProfile padSmall" />
+									{% endfor %}
+								</div>
+							</div>
+						</a>
+					{% else %}
+						<h3>No courses yet. Won't you join one?</h3>
+					{% endfor %}
+			</div>
+			<div class="span6">
+				<div class="row">
+					<div class="span6 pushdown">
+						<text class="courseheader">Collaborators</text><br />
+						{% for collaborator in collaborators %}
+							<a href="http://www.facebook.com/{{ collaborator.fid }}">
+								<div class='kewl'>
+									<img src="{{ collaborator.picurl }}" class="collabProfile" />
+									<br />
+									{{ collaborator.fname }}
+								</div>
+							</a>
+						{% else %}
+							<h3>No collaborators yet.</h3>
+						{% endfor %}
+					</div>
+				</div>
+				<div class="row oldnoterow">
+					<div class="span6 pushdown">
+						<text class="courseheader">Old notes</text>
+						<ul class="notes">
+							{% for note in g.user.notes %}
+								<li><a href="{{ url_for('notepad', coursename=note.course.name, noteid=note.id) }}" target="_self">{{ note.course.name }} - {{ note.date }} - {{ note.name }}</a></li>
+							{% else %}
+								<h3>No notes so far!</h3>
+							{% endfor %}
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
 
 {% endblock %}

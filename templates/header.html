@@ -5,11 +5,22 @@
                 <div class="span2 logo"></div>
             </a>
         	{% if g.user %}
-                <div class="span1 offset8">
-            		<a href="{{ url_for('home') }}">home</a>
-            	</div>
-            	<div class="span1">
-                	<a href="{{ url_for('logout') }}">logout</a>
+                <div class="dropdown span1 offset9 mediapullup">
+                    <a class="dropdown-toggle userIcon pull-right nav" role="button" data-toggle="dropdown" id="dLabel" href="#">
+                        <img src='{{ g.user.spicurl }}' class="smallProfile" /><b class="caret"></b>
+                    </a>
+                    <ul class="dropdown-menu nice" role="menu" aria-labelledby="dLabel">
+                        <li>
+                            <a href="{{ url_for('home') }}">Home</a>
+                        </li>
+                        <li>
+                            <a href="{{ url_for('settings') }}">Settings</a>
+                        </li>
+                        <li class="divider"></li>
+                        <li>
+                            <a href="{{ url_for('logout') }}">Logout</a>
+                        </li>
+                    </ul>
                 </div>
             {% else %}
                 <a href="{{ url_for('login') }}">

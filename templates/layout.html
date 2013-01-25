@@ -29,10 +29,6 @@
 
         {% include "header.html" %}
 
-        {% for message in get_flashed_messages() %}
-            <div class="flash span12">{{ message }}</div>
-        {% endfor %}
-
         {% block body %}{% endblock %}
 
         {% include "footer.html" %}
@@ -40,6 +36,8 @@
         <script src="http://code.jquery.com/jquery-latest.js"></script>
         <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
         <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/jedit.js') }}"></script>
+        <script>$('body').editables({ onFreeze:inplace });</script>
 
         <script type="text/javascript">
 
