@@ -29,19 +29,19 @@ FACEBOOK_APP_SECRET = '8f3dc21d612f5ef19dbc98221e1c7a0d'
 # etherpad api connection
 apiKey = "qSoNop1JjHxPQcJkv3L5rrmgBrqNgC1t"
 # local
-#pad = EtherpadLiteClient(apiKey,'http://0.0.0.0:9001/api')
+pad = EtherpadLiteClient(apiKey,'http://0.0.0.0:9001/api')
 # remote
-pad = EtherpadLiteClient(apiKey,'http://goombastomp.cloudfoundry.com/api')
+#pad = EtherpadLiteClient(apiKey,'http://goombastomp.cloudfoundry.com/api')
 
 # make app
 app = Flask(__name__)
 #heroku
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
+#app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
 #local
-#app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/rocketjumpdb'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/rocketjumpdb'
 app.debug = DEBUG
 app.secret_key = SECRET_KEY
-oauth = OAuth()
+# oauth = OAuth()
 db = SQLAlchemy(app)
 app.config.from_object(__name__)
 
@@ -52,6 +52,7 @@ def initdb():
     db.session.add(newCourse)
     db.session.commit()
 
+'''
 facebook = oauth.remote_app('facebook',
     base_url='https://graph.facebook.com/',
     request_token_url=None,
@@ -59,8 +60,9 @@ facebook = oauth.remote_app('facebook',
     authorize_url='https://www.facebook.com/dialog/oauth',
     consumer_key=FACEBOOK_APP_ID,
     consumer_secret=FACEBOOK_APP_SECRET,
-    request_token_params={'scope': 'email,user_photos,publish_actions'}
+    request_token_params={'scope': 'email,user_photos,publish_actions,user_education_history'}
     )
+'''
 
 # many to many relationships
 
@@ -304,7 +306,7 @@ def handle_oauth_exception(error):
 def index():
     """Render website's home page."""
     return render_template('index.html')
-
+'''
 @app.route('/login')
 def login():
     return facebook.authorize(callback=url_for('facebook_authorized',
@@ -335,6 +337,31 @@ def facebook_authorized(resp):
         db.session.commit()
     session['fid'] = me.data['id']
     return redirect(url_for('home'))
+'''
+@app.route('/login')
+def facebook_authorized(resp):
+    if resp is None:
+        error = 'Access denied: reason=%s error=%s' %(
+            request.args['error_reason'],
+            request.args['error_descriptions']
+        )
+        return render_template('home.html', error=error)
+    xyz = (resp['access_token'], '')
+    session['oauth_token'] = xyz
+    me = facebook.get('/me')
+    checkUser = db.session.query(User).filter(User.fid==me.data['id']).all()
+    if not checkUser:
+        fname = me.data['name'].split()[0]
+        lname = me.data['name'].split()[-1]
+        education='Massachusetts Institute of Technology (MIT)'
+        if 'education' in me.data:
+            education=me.data['education'][-1]['school']['name']
+        newuser = User(me.data['id'], fname, lname, me.data['email'], me.data['username'], education)
+        db.session.add(newuser)
+        db.session.commit()
+    session['fid'] = me.data['id']
+    return redirect(url_for('home'))
+
 
 @facebook.tokengetter
 def get_facebook_oauth_token():
@@ -563,6 +590,10 @@ def send_text_file(file_name):
     """Send your static text file."""
     file_dot_text = file_name + '.txt'
     return app.send_static_file(file_dot_text)
+
+@app.route('/channel.html')
+def channel():
+    return render_template('channel.html')
 
 
 @app.after_request
