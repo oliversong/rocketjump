@@ -18,6 +18,7 @@ Ruby is too confusing.
 * Setup real node.js db and deploy to nodejitsu
 * Initial "Are you in this course?"
 * Autocomplete
+* Cookie authentication
 
 
 ### Done
