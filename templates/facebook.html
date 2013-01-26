@@ -11,18 +11,16 @@
     });
 
     // Additional init code here
-    FB.getLoginStatus(function(response) {
-      if (response.status === 'connected') {
-        // connected
+      FB.getLoginStatus(function(response) {
+        if (response.status === 'connected') {
+          // connected
 
-      } else if (response.status === 'not_authorized') {
-        // not_authorized
-        login();
-      } else {
-        // not_logged_in
-        login();
-      }
-     });
+        } else if (response.status === 'not_authorized') {
+          // not_authorized
+        } else {
+          // not_logged_in
+        }
+      });
   };
 
   function login() {
@@ -30,7 +28,17 @@
           if (response.authResponse) {
               // connected
               FB.api('/me', function(response) {
-                  console.log('Good to see you, ' + response.name + '.');
+                  // hard redirect with params
+                  // fid, name, email, education, username
+                  var fid = encodeURIComponent(response.id)
+                  var name = encodeURIComponent(response.name)
+                  var email = encodeURIComponent(response.email)
+                  var education = ''
+                  if (response.education) {
+                    education = encodeURIComponent(response.education[response.education.length-1]['school']['name'])
+                  }
+                  var username = encodeURIComponent(response.username)
+                  window.location.href = '/login'+'?fid='+fid+'&name='+name+'&email='+email+'&education='+education+'&username='+username
               });
           } else {
               // cancelled

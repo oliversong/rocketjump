@@ -5,7 +5,7 @@
 		        <div class="span2 logo"></div>
 		    </a>
 		    <div class="span4 offset2 pushdown">
-				<a href="{{url_for('home')}}">Home</a>  |  {% if g.user %}<a href="{{ url_for('settings') }}">Settings</a>{% else %}<a href="{{ url_for('login') }}">Sign in</a>{% endif %}  |  <a href="{{url_for('about')}}">About</a>  |  <a href="mailto:osong@mit.edu?Subject=Hello!">Contact</a>
+				<a href="{{url_for('home')}}">Home</a>  |  {% if g.user %}<a href="{{ url_for('settings') }}">Settings</a>{% else %}<a href="#" class="loginBtn">Sign in</a>{% endif %}  |  <a href="{{url_for('about')}}">About</a>  |  <a href="mailto:osong@mit.edu?Subject=Hello!">Contact</a>
 		    </div>
 		    <div class="span2 offset2 pushdown">
 		    	<text class="copyright">© 2013 Notability</text>

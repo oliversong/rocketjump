@@ -339,33 +339,30 @@ def facebook_authorized(resp):
     return redirect(url_for('home'))
 '''
 @app.route('/login')
-def facebook_authorized(resp):
-    if resp is None:
-        error = 'Access denied: reason=%s error=%s' %(
-            request.args['error_reason'],
-            request.args['error_descriptions']
-        )
-        return render_template('home.html', error=error)
-    xyz = (resp['access_token'], '')
-    session['oauth_token'] = xyz
-    me = facebook.get('/me')
-    checkUser = db.session.query(User).filter(User.fid==me.data['id']).all()
+def facebook_login():
+    print 'hello'
+    checkUser = db.session.query(User).filter(User.fid==request.args['fid']).all()
     if not checkUser:
-        fname = me.data['name'].split()[0]
-        lname = me.data['name'].split()[-1]
+        fname = request.args['name'].split()[0]
+        lname = request.args['name'].split()[-1]
         education='Massachusetts Institute of Technology (MIT)'
-        if 'education' in me.data:
-            education=me.data['education'][-1]['school']['name']
-        newuser = User(me.data['id'], fname, lname, me.data['email'], me.data['username'], education)
+        if 'education' in request.args:
+            education=request.args['education']
+        fid = request.args['fid']
+        email = request.args['email']
+        username = request.args['username']
+        print fid, fname, lname, email, username, education
+        newuser = User(fid, fname, lname, email, username, education)
         db.session.add(newuser)
         db.session.commit()
-    session['fid'] = me.data['id']
+    session['fid'] = request.args['fid']
     return redirect(url_for('home'))
 
-
+'''
 @facebook.tokengetter
 def get_facebook_oauth_token():
     return session.get('oauth_token')
+'''
 
 @app.route('/logout')
 def logout():
