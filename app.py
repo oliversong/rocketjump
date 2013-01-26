@@ -38,7 +38,6 @@ app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
 #app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/rocketjumpdb'
 
 app.debug = DEBUG
-app.SERVER_NAME= 'www.notability.org'
 app.secret_key = SECRET_KEY
 # oauth = OAuth()
 db = SQLAlchemy(app)
@@ -291,6 +290,9 @@ def index():
 def facebook_login():
     print 'hello'
     fid = request.args['fid']
+    print 'assigning cookie', fid
+    session['fid'] = fid
+    print 'session assigned to:', session['fid']
     checkUser = db.session.query(User).filter(User.fid==fid).all()
     if not checkUser:
         fname = request.args['name'].split()[0]
@@ -304,9 +306,6 @@ def facebook_login():
         newuser = User(fid, fname, lname, email, username, education)
         db.session.add(newuser)
         db.session.commit()
-    print 'assigning cookie', fid
-    session['fid'] = fid
-    print 'session assigned to:', session['fid']
     return redirect(url_for('home'))
 
 '''
