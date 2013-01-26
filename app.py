@@ -283,13 +283,7 @@ def before_request():
 
 @app.errorhandler(OAuthException)
 def handle_oauth_exception(error):
-    if resp is None:
-        error = 'Access denied: reason=%s error=%s' %(
-            request.args['error_reason'],
-            request.args['error_descriptions']
-        )
-        return render_template('home.html', error=error)
-    xyz = (resp['access_token'], '')
+    xyz = (request.args.get('code'), '')
     session['oauth_token'] = xyz
     me = facebook.get('/me')
     checkUser = db.session.query(User).filter(User.fid==me.data['id']).all()
