@@ -280,80 +280,31 @@ def before_request():
 ###
 # Routing for your application.
 ###
-'''
-@app.errorhandler(OAuthException)
-def handle_oauth_exception(error):
-    xyz = (request.args.get('code'), '')
-    session['oauth_token'] = xyz
-    me = facebook.get('/me')
-    checkUser = db.session.query(User).filter(User.fid==me.data['id']).all()
-    if not checkUser:
-        fname = me.data['name'].split()[0]
-        lname = me.data['name'].split()[-1]
-        education='Massachusetts Institute of Technology (MIT)'
-        if 'education' in me.data:
-            education=me.data['education'][-1]['school']['name']
-        newuser = User(me.data['id'], fname, lname, me.data['email'], me.data['username'], education)
-        db.session.add(newuser)
-        db.session.commit()
-    session['fid'] = me.data['id']
-    return redirect(url_for('home'))
-'''
 
 @app.route('/')
 def index():
     """Render website's home page."""
     return render_template('index.html')
-'''
-@app.route('/login')
-def login():
-    return facebook.authorize(callback=url_for('facebook_authorized',
-        next=request.args.get('next') or request.referrer or None,
-        _external=True))
 
-@app.route('/login/authorized')
-@facebook.authorized_handler
-def facebook_authorized(resp):
-    if resp is None:
-        error = 'Access denied: reason=%s error=%s' %(
-            request.args['error_reason'],
-            request.args['error_descriptions']
-        )
-        return render_template('home.html', error=error)
-    xyz = (resp['access_token'], '')
-    session['oauth_token'] = xyz
-    me = facebook.get('/me')
-    checkUser = db.session.query(User).filter(User.fid==me.data['id']).all()
-    if not checkUser:
-        fname = me.data['name'].split()[0]
-        lname = me.data['name'].split()[-1]
-        education='Massachusetts Institute of Technology (MIT)'
-        if 'education' in me.data:
-            education=me.data['education'][-1]['school']['name']
-        newuser = User(me.data['id'], fname, lname, me.data['email'], me.data['username'], education)
-        db.session.add(newuser)
-        db.session.commit()
-    session['fid'] = me.data['id']
-    return redirect(url_for('home'))
-'''
 @app.route('/login')
 def facebook_login():
     print 'hello'
-    checkUser = db.session.query(User).filter(User.fid==request.args['fid']).all()
+    fid = request.args['fid']
+    checkUser = db.session.query(User).filter(User.fid==fid).all()
     if not checkUser:
         fname = request.args['name'].split()[0]
         lname = request.args['name'].split()[-1]
         education='Massachusetts Institute of Technology (MIT)'
         if 'education' in request.args:
             education=request.args['education']
-        fid = request.args['fid']
         email = request.args['email']
         username = request.args['username']
         print fid, fname, lname, email, username, education
         newuser = User(fid, fname, lname, email, username, education)
         db.session.add(newuser)
         db.session.commit()
-    session['fid'] = request.args['fid']
+    print 'assigning cookie', fid
+    session['fid'] = fid 
     return redirect(url_for('home'))
 
 '''
