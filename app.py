@@ -59,7 +59,7 @@ facebook = oauth.remote_app('facebook',
     authorize_url='https://www.facebook.com/dialog/oauth',
     consumer_key=FACEBOOK_APP_ID,
     consumer_secret=FACEBOOK_APP_SECRET,
-    request_token_params={'scope':'email,user_birthday,user_education_history,user_location,user_photos,publish_actions'}
+    request_token_params={'scope': 'email,user_birthday,user_education_history,user_location,user_photos,publish_actions'}
     )
 
 # many to many relationships
@@ -314,7 +314,6 @@ def facebook_authorized(resp):
         newuser = User(me.data['id'], fname, lname, me.data['email'], me.data['username'], education)
         db.session.add(newuser)
         db.session.commit()
-    flash('You were logged in')
     session['fid'] = me.data['id']
     return redirect(url_for('home'))
 
