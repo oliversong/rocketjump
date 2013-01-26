@@ -59,7 +59,7 @@ facebook = oauth.remote_app('facebook',
     authorize_url='https://www.facebook.com/dialog/oauth',
     consumer_key=FACEBOOK_APP_ID,
     consumer_secret=FACEBOOK_APP_SECRET,
-    request_token_params={'scope': 'email,user_birthday,user_education_history,user_location,user_photos,publish_actions'}
+    request_token_params={'scope': 'email,user_photos,publish_actions,user_education_history'}
     )
 
 # many to many relationships
@@ -280,7 +280,7 @@ def before_request():
 ###
 # Routing for your application.
 ###
-
+'''
 @app.errorhandler(OAuthException)
 def handle_oauth_exception(error):
     xyz = (request.args.get('code'), '')
@@ -298,6 +298,7 @@ def handle_oauth_exception(error):
         db.session.commit()
     session['fid'] = me.data['id']
     return redirect(url_for('home'))
+'''
 
 @app.route('/')
 def index():
