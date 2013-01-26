@@ -39,7 +39,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
 
 app.debug = DEBUG
 app.secret_key = SECRET_KEY
-app.SERVER_NAME = 'notability.org'
+app.SERVER_NAME = '.notability.org'
 # oauth = OAuth()
 db = SQLAlchemy(app)
 app.config.from_object(__name__)
