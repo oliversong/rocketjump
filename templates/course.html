@@ -54,7 +54,9 @@
 						Professor: {{ course.professor }}<br />
 						Location: {{ course.location }}<br />
 						Enrollment: {{ course.users.all()|count }}<br />
-						Most recent lecture: {{ course.lectures[-1].date }}<br />
+						{% if course.lectures.all() %}
+						Most recent lecture: {{ course.lectures.all()[-1].date }}<br />
+						{% endif %}
 						Live: {% if live %}Yes{% else %}No{% endif %}
 						<br /><br />
 						{{ course.description }}

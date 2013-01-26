@@ -16,6 +16,8 @@ Ruby is too confusing.
 * Matchmaker algorithm
 * Reroll your partner?
 * Setup real node.js db and deploy to nodejitsu
+* Initial "Are you in this course?"
+* Autocomplete
 
 
 ### Done
