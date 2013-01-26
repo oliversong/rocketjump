@@ -22,12 +22,9 @@ DEBUG = True
 PER_PAGE = 20
 SECRET_KEY = "devopsborat"
 
-# facebook api connection
-FACEBOOK_APP_ID = '124499577716801'
-FACEBOOK_APP_SECRET = '8f3dc21d612f5ef19dbc98221e1c7a0d'
-
 # etherpad api connection
 apiKey = "qSoNop1JjHxPQcJkv3L5rrmgBrqNgC1t"
+
 # local
 #pad = EtherpadLiteClient(apiKey,'http://0.0.0.0:9001/api')
 # remote
@@ -39,6 +36,7 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
 #local
 #app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/rocketjumpdb'
+
 app.debug = DEBUG
 app.secret_key = SECRET_KEY
 # oauth = OAuth()
