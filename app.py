@@ -306,7 +306,7 @@ def facebook_login():
         newuser = User(fid, fname, lname, email, username, education)
         db.session.add(newuser)
         db.session.commit()
-    return render_template('home')
+    return render_template('home.html')
 
 '''
 @facebook.tokengetter
