@@ -283,7 +283,7 @@ def before_request():
 
 @app.errorhandler(OAuthException)
 def handle_oauth_exception(error):
-    return "Yo no worries man it should be fine"
+    return redirect(url_for('facebook_authorized',next=request.args.get('next') or request.referrer or None))
 
 @app.route('/')
 def index():
