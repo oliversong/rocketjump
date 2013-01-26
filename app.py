@@ -294,6 +294,9 @@ def facebook_login():
     print 'assigning cookie', fid
     session['fid'] = fid
     print 'session assigned to:', session['fid']
+    print 'modified? ',session.modified
+    print 'new?', session.new
+    session.modified = True
     checkUser = db.session.query(User).filter(User.fid==fid).all()
     if not checkUser:
         fname = request.args['name'].split()[0]
