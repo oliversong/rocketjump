@@ -281,7 +281,7 @@ def before_request():
 # Routing for your application.
 ###
 
-@app.errorhandler(OauthException)
+@app.errorhandler(OAuthException)
 def handle_oauth_exception(error):
     return "Yo no worries man it should be fine"
 
