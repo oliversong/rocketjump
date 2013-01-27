@@ -46,8 +46,8 @@ app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/rocketjumpdb'
 app.debug = DEBUG
 app.secret_key = SECRET_KEY
-app.SESSION_COOKIE_DOMAIN = '.notability.org'
-app.SERVER_NAME = 'notability.org'
+app.config['SESSION_COOKIE_DOMAIN'] = '.notability.org'
+app.config['SERVER_NAME'] = 'notability.org'
 oauth = OAuth()
 db = SQLAlchemy(app)
 app.config.from_object(__name__)
