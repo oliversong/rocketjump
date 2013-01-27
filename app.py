@@ -55,8 +55,10 @@ padURL = 'http://goombastomp.cloudfoundry.com/p/'
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
 redisURL = os.environ['REDISTOGO_URL']
 o = urlparse(redisURL)
-app.config['REDIS_HOST'] = o.hostname
-app.config['REDIS_PORT'] = o.port 
+print "hostname: ",o.hostname
+print "port: ",o.port
+app.config['REDIS_HOST'] = 'redis://redistogo:25fe4c66409b87d83a785366855ae95a@dory.redistogo.com'
+app.config['REDIS_PORT'] = '9235'
 app.config['REDIS_DB'] = 0
 app.config['REDIS_PASSWORD'] = None
 # app.config['SESSION_COOKIE_DOMAIN'] = 'notability.org'
