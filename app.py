@@ -50,7 +50,6 @@ app.SESSION_COOKIE_DOMAIN = '*.notability.org'
 app.SERVER_NAME = 'notability.org'
 oauth = OAuth()
 db = SQLAlchemy(app)
-app.session_interface = ItsdangerousSessionInterface()
 app.config.from_object(__name__)
 
 def initdb():
@@ -628,6 +627,8 @@ def page_not_found(error):
     """Custom 404 page."""
     return render_template('404.html'), 404
 
+
+app.session_interface = ItsdangerousSessionInterface()
 
 if __name__ == '__main__':
     app.run(DEBUG=True)
