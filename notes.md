@@ -66,6 +66,14 @@ make/drop tables
 	No relations found
 	>>> \q
 
+MYSQL db refresh:
+
+	mysql -u root -p
+	> password
+	> show databases
+	> use [database]
+	> TRUNCATE TABLE [table]
+
 ## Misc
 
 Starting the server:

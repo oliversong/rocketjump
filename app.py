@@ -25,31 +25,33 @@ DEBUG = True
 PER_PAGE = 20
 SECRET_KEY = "devopsborat"
 
-# facebook api connection
-FACEBOOK_APP_ID = '124499577716801'
-FACEBOOK_APP_SECRET = '8f3dc21d612f5ef19dbc98221e1c7a0d'
+# local configs
 # FACEBOOK_APP_ID = '136661329828261'
 # FACEBOOK_APP_SECRET = 'd5be13df741b358d10a26aceeeff5dd0'
+# DOMAIN = '.testability.org'
+# pad = EtherpadLiteClient(apiKey,'http://0.0.0.0:9001/api')
+# padURL = 'http://pad.testability.org:9001/p/'
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/rocketjumpdb'
+
+# heroku configs
+FACEBOOK_APP_ID = '124499577716801'
+FACEBOOK_APP_SECRET = '8f3dc21d612f5ef19dbc98221e1c7a0d'
+DOMAIN = '.notability.org'
+pad = EtherpadLiteClient(apiKey,'http://goombastomp.cloudfoundry.com/api')
+padURL = 'http://goombastomp.cloudfoundry.com/p/'
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
+app.config['SESSION_COOKIE_DOMAIN'] = '.notability.org'
+app.config['SERVER_NAME'] = 'notability.org'
 
 # etherpad api connection
 apiKey = "qSoNop1JjHxPQcJkv3L5rrmgBrqNgC1t"
 
-# local
-# pad = EtherpadLiteClient(apiKey,'http://0.0.0.0:9001/api')
-# remote
-pad = EtherpadLiteClient(apiKey,'http://goombastomp.cloudfoundry.com/api')
 
 # make app
 app = Flask(__name__)
-#heroku
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
-#local
-# app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/rocketjumpdb'
 
 app.config['DEBUG'] = DEBUG
 app.config['SECRET_KEY'] = SECRET_KEY
-# app.config['SESSION_COOKIE_DOMAIN'] = '.notability.org'
-# app.config['SERVER_NAME'] = 'notability.org'
 oauth = OAuth()
 db = SQLAlchemy(app)
 
@@ -293,7 +295,7 @@ def createPad(user,course,lecture):
     db.session.add(newNote)
     db.session.commit()
     pad.createGroupPad(newNote.lecture.groupID, newNote.id)
-    newNote.url = 'http://goombastomp.cloudfoundry.com/p/' + lecture.groupID + "$" + str(newNote.id)
+    newNote.url = padURL + lecture.groupID + "$" + str(newNote.id)
     db.session.commit()
 
     return newNote
@@ -358,28 +360,37 @@ def login():
 @app.route('/login/authorized')
 @facebook.authorized_handler
 def facebook_authorized(resp):
+    print 'hello'
     if resp is None:
         error = 'Access denied: reason=%s error=%s' %(
             request.args['error_reason'],
             request.args['error_descriptions']
         )
+        print error
         return render_template('home.html', error=error)
     xyz = (resp['access_token'], '')
     session['oauth_token'] = xyz
     me = facebook.get('/me')
-    checkUser = db.session.query(User).filter(User.fid==me.data['id']).all()
+    print 'getting user'
+    fid = me.data['id']
+    print 'got fid', fid
+    checkUser = db.session.query(User).filter(User.fid==fid).first()
+    print 'got user from DB'
     if not checkUser:
-        fname = request.args['name'].split()[0]
-        lname = request.args['name'].split()[-1]
+        print 'no user yet'
+        fname = me.data['name'].split()[0]
+        lname = me.data['name'].split()[-1]
         education='Massachusetts Institute of Technology (MIT)'
-        if 'education' in request.args:
-            education=request.args['education']
-        email = request.args['email']
-        username = request.args['username']
+        if 'education' in me.data:
+            education=me.data['education'][-1]['school']['name']
+        email = me.data['email']
+        username = me.data['username']
         print fid, fname, lname, email, username, education
         newuser = User(fid, fname, lname, email, username, education)
         db.session.add(newuser)
         db.session.commit()
+    print 'giving session token'
+    session['fid'] = fid
     return redirect(url_for('home')) 
 
 @facebook.tokengetter
@@ -392,7 +403,7 @@ def logout():
     flash('You were logged out')
     session.pop('fid', None)
     resp = make_response(redirect(url_for('index')))
-    resp.set_cookie('sessionID', '', expires=0, domain='.notability.org')
+    resp.set_cookie('sessionID', '', expires=0, domain=DOMAIN)
     return resp
 
 @app.route('/settings/')
@@ -560,7 +571,7 @@ def notepad(coursename, noteid):
         flash("Sorry, you're not part of that note!")
         redirect(url_for('home'))
     response = make_response(render_template('notepad.html',note=note))
-    response.set_cookie('sessionID',user.sessionID, domain=".notability.org")
+    response.set_cookie('sessionID',user.sessionID, domain=DOMAIN)
     return response
 
 @app.route('/<coursename>/<int:noteid>/done', methods=['GET','POST'])
@@ -609,11 +620,6 @@ def send_text_file(file_name):
     """Send your static text file."""
     file_dot_text = file_name + '.txt'
     return app.send_static_file(file_dot_text)
-
-@app.route('/channel.html')
-def channel():
-    return render_template('channel.html')
-
 
 @app.after_request
 def add_header(response):

@@ -23,9 +23,11 @@
                     </ul>
                 </div>
             {% else %}
-                <div class="span2 offset8 signin loginBtn">
-            	   Sign in
-        	    </div>
+                <a href="{{ url_for('login') }}">
+                    <div class="span2 offset8 signin loginBtn">
+                	   Sign in
+            	    </div>
+                </a>
         	{% endif %}
         </div>
     </div>
