@@ -46,7 +46,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/rocketjumpdb'
 app.debug = DEBUG
 app.secret_key = SECRET_KEY
-app.SESSION_COOKIE_DOMAIN = '*.notability.org'
+app.SESSION_COOKIE_DOMAIN = '.notability.org'
 app.SERVER_NAME = 'notability.org'
 oauth = OAuth()
 db = SQLAlchemy(app)
@@ -292,7 +292,7 @@ def createPad(user,course,lecture):
     db.session.add(newNote)
     db.session.commit()
     pad.createGroupPad(newNote.lecture.groupID, newNote.id)
-    newNote.url = 'http://pad.notability.org:9001/p/' + lecture.groupID + "$" + str(newNote.id)
+    newNote.url = 'http://goombastomp.cloudfoundry.com/p/' + lecture.groupID + "$" + str(newNote.id)
     db.session.commit()
 
     return newNote
