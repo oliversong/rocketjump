@@ -57,10 +57,10 @@ redisURL = os.environ['REDISTOGO_URL']
 o = urlparse(redisURL)
 print "hostname: ",o.hostname
 print "port: ",o.port
-app.config['REDIS_HOST'] = 'redistogo:25fe4c66409b87d83a785366855ae95a@dory.redistogo.com'
+app.config['REDIS_HOST'] = o.hostname
 app.config['REDIS_PORT'] = '9235'
 app.config['REDIS_DB'] = 0
-app.config['REDIS_PASSWORD'] = None
+app.config['REDIS_PASSWORD'] = o.password
 # app.config['SESSION_COOKIE_DOMAIN'] = 'notability.org'
 # app.config['SERVER_NAME'] = 'www.notability.org'
 
