@@ -12,7 +12,7 @@ import  time, os
 from flask import Flask, render_template, request, redirect, url_for, abort, g, flash, escape, session, make_response
 from werkzeug import check_password_hash, generate_password_hash
 from datetime import datetime
-from flask_oauth import OAuth
+from flask_oauth import OAuth, OAuthException
 from flask.ext.sqlalchemy import SQLAlchemy
 from sqlalchemy import desc
 from py_etherpad import EtherpadLiteClient
