@@ -74,6 +74,10 @@ MYSQL db refresh:
 	> use [database]
 	> TRUNCATE TABLE [table]
 
+MYSQL tunnel on cloudfoundry
+
+	vmc tunnel goombadb
+
 ## Misc
 
 Starting the server:

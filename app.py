@@ -28,6 +28,9 @@ SECRET_KEY = "devopsborat"
 # etherpad api connection
 apiKey = "qSoNop1JjHxPQcJkv3L5rrmgBrqNgC1t"
 
+# make app
+app = Flask(__name__)
+
 # local configs
 # FACEBOOK_APP_ID = '136661329828261'
 # FACEBOOK_APP_SECRET = 'd5be13df741b358d10a26aceeeff5dd0'
@@ -45,11 +48,6 @@ padURL = 'http://goombastomp.cloudfoundry.com/p/'
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
 app.config['SESSION_COOKIE_DOMAIN'] = '.notability.org'
 app.config['SERVER_NAME'] = 'notability.org'
-
-
-
-# make app
-app = Flask(__name__)
 
 app.config['DEBUG'] = DEBUG
 app.config['SECRET_KEY'] = SECRET_KEY
