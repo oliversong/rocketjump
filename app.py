@@ -347,12 +347,10 @@ def handle_oauth_exception(error):
 @app.route('/')
 def index():
     """Render website's home page."""
-    session['blah']='test'
     return render_template('index.html')
 
 @app.route('/login')
 def login():
-    session['hi']="What's wrong?"
     return facebook.authorize(callback=url_for('facebook_authorized',
         next=request.args.get('next') or request.referrer or None,
         _external=True))
@@ -382,7 +380,7 @@ def facebook_authorized(resp):
         newuser = User(fid, fname, lname, email, username, education)
         db.session.add(newuser)
         db.session.commit()
-    return 'hi' 
+    return redirect(url_for('home')) 
 
 @facebook.tokengetter
 def get_facebook_oauth_token():
