@@ -289,7 +289,7 @@ def handle_oauth_exception(error):
     print error.data
     print error.message
     print error.type
-    return 'what'
+    return ':('
 
 @app.route('/')
 def index():
@@ -298,6 +298,7 @@ def index():
 
 @app.route('/login')
 def login():
+    session['hi']="What's wrong?"
     return facebook.authorize(callback=url_for('facebook_authorized',
         next=request.args.get('next') or request.referrer or None,
         _external=True))
