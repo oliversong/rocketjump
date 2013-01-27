@@ -18,9 +18,6 @@ $('.finishbtn').click ()->
 		$.noop()
 		)
 
-$('.loginBtn').click ()->
-	login();
-
 ///$('.noteName').click ()->
 	blah = $(this).text()
 	id = $(this).attr('noteid')

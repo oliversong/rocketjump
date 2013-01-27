@@ -29,10 +29,6 @@
     });
   });
 
-  $('.loginBtn').click(function() {
-    return login();
-  });
-
   /$('.noteName').click()->blah=$(this).text()id=$(this).attr('noteid')course=$(this).attr('coursename')$(this).replaceWith('''<spanclass="replaceme"><inputtype="text"class="nameReplace"name="nameReplace"placeholder="'''+blah+'''"\/><buttonclass="btnbtn-warningupdateName">Update<\/button><\/span>''')$('.updateName').click()->newName=$('.nameReplace').val()$.post('\/'+course+'\/'+id+'\/updateName',{name:newName},(d,st,xr)->$('.replaceme'))/;
 
 
