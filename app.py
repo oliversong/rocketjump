@@ -25,21 +25,27 @@ DEBUG = True
 PER_PAGE = 20
 SECRET_KEY = "devopsborat"
 
+# facebook api connection
+FACEBOOK_APP_ID = '124499577716801'
+FACEBOOK_APP_SECRET = '8f3dc21d612f5ef19dbc98221e1c7a0d'
+# FACEBOOK_APP_ID = '136661329828261'
+# FACEBOOK_APP_SECRET = 'd5be13df741b358d10a26aceeeff5dd0'
+
 # etherpad api connection
 apiKey = "qSoNop1JjHxPQcJkv3L5rrmgBrqNgC1t"
 
 # local
-pad = EtherpadLiteClient(apiKey,'http://0.0.0.0:9001/api')
+# pad = EtherpadLiteClient(apiKey,'http://0.0.0.0:9001/api')
 # remote
-# pad = EtherpadLiteClient(apiKey,'http://goombastomp.cloudfoundry.com/api')
+pad = EtherpadLiteClient(apiKey,'http://goombastomp.cloudfoundry.com/api')
 
 # make app
 app = Flask(__name__)
 #heroku
-# app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
 #local
-
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/rocketjumpdb'
+
 app.config['DEBUG'] = DEBUG
 app.config['SECRET_KEY'] = SECRET_KEY
 app.config['SESSION_COOKIE_DOMAIN'] = '.notability.org'
