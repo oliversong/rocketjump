@@ -376,15 +376,20 @@ def handle_oauth_exception(error):
     print error.data
     print error.message
     print error.type
+    print session['hi']
     return ':('
 
 @app.route('/')
 def index():
     """Render website's home page."""
+    print "at index"
+    session['hi']='hello'
     return render_template('index.html')
 
 @app.route('/login')
 def login():
+    print "at login"
+    print session['hi']
     return facebook.authorize(callback=url_for('facebook_authorized',
         next=request.args.get('next') or request.referrer or None,
         _external=True))
@@ -392,8 +397,9 @@ def login():
 @app.route('/login/authorized')
 @facebook.authorized_handler
 def facebook_authorized(resp):
-    print 'hello'
-    if resp is None:
+    print "at login/authorized"
+    print session['hi']
+   if resp is None:
         error = 'Access denied: reason=%s error=%s' %(
             request.args['error_reason'],
             request.args['error_descriptions']
@@ -670,6 +676,7 @@ def page_not_found(error):
     return render_template('404.html'), 404
 
 redisInst = from_url(app.config['REDIS_URL'])
+# redisInst = init_redis(app)
 app.session_interface = RedisSessionInterface(redisInst)
 
 if __name__ == '__main__':
