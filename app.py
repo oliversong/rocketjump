@@ -16,6 +16,9 @@ from flask_oauth import OAuth, OAuthException
 from flask.ext.sqlalchemy import SQLAlchemy
 from sqlalchemy import desc
 from py_etherpad import EtherpadLiteClient
+from werkzeug.datastructures import CallbackDict
+from flask.sessions import SessionInterface, SessionMixin
+from itsdangerous import URLSafeTimedSerializer, BadSignature
 
 # config
 DEBUG = True
@@ -26,23 +29,23 @@ SECRET_KEY = "devopsborat"
 apiKey = "qSoNop1JjHxPQcJkv3L5rrmgBrqNgC1t"
 
 # local
-#pad = EtherpadLiteClient(apiKey,'http://0.0.0.0:9001/api')
+pad = EtherpadLiteClient(apiKey,'http://0.0.0.0:9001/api')
 # remote
-pad = EtherpadLiteClient(apiKey,'http://goombastomp.cloudfoundry.com/api')
+# pad = EtherpadLiteClient(apiKey,'http://goombastomp.cloudfoundry.com/api')
 
 # make app
 app = Flask(__name__)
 #heroku
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
+# app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
 #local
-#app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/rocketjumpdb'
 
-app.debug = DEBUG
-app.secret_key = SECRET_KEY
-app.SERVER_NAME = 'notability.org'
-# oauth = OAuth()
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/rocketjumpdb'
+app.config['DEBUG'] = DEBUG
+app.config['SECRET_KEY'] = SECRET_KEY
+app.config['SESSION_COOKIE_DOMAIN'] = '.notability.org'
+app.config['SERVER_NAME'] = 'notability.org'
+oauth = OAuth()
 db = SQLAlchemy(app)
-app.config.from_object(__name__)
 
 def initdb():
     db.drop_all()
@@ -51,7 +54,6 @@ def initdb():
     db.session.add(newCourse)
     db.session.commit()
 
-'''
 facebook = oauth.remote_app('facebook',
     base_url='https://graph.facebook.com/',
     request_token_url=None,
@@ -59,9 +61,8 @@ facebook = oauth.remote_app('facebook',
     authorize_url='https://www.facebook.com/dialog/oauth',
     consumer_key=FACEBOOK_APP_ID,
     consumer_secret=FACEBOOK_APP_SECRET,
-    request_token_params={'scope': 'email,user_photos,publish_actions,user_education_history'}
+    request_token_params={'scope':'email,user_birthday,user_education_history,user_photos,publish_actions'}
     )
-'''
 
 # many to many relationships
 
@@ -218,6 +219,53 @@ class Asset(db.Model):
     def __repr__(self):
         return '<Asset %r>' % self.location
 
+class ItsdangerousSession(CallbackDict, SessionMixin):
+
+    def __init__(self, initial=None):
+        def on_update(self):
+            self.modified = True
+        CallbackDict.__init__(self, initial, on_update)
+        self.modified = False
+
+
+class ItsdangerousSessionInterface(SessionInterface):
+    salt = 'cookie-session'
+    session_class = ItsdangerousSession
+
+    def get_serializer(self, app):
+        if not app.secret_key:
+            return None
+        return URLSafeTimedSerializer(app.secret_key, 
+                                      salt=self.salt)
+
+    def open_session(self, app, request):
+        s = self.get_serializer(app)
+        if s is None:
+            return None
+        val = request.cookies.get(app.session_cookie_name)
+        if not val:
+            return self.session_class()
+        max_age = app.permanent_session_lifetime.total_seconds()
+        try:
+            data = s.loads(val, max_age=max_age)
+            return self.session_class(data)
+        except BadSignature:
+            return self.session_class()
+
+    def save_session(self, app, session, response):
+        domain = self.get_cookie_domain(app)
+        if not session:
+            if session.modified:
+                response.delete_cookie(app.session_cookie_name,
+                                   domain=domain)
+            return
+        expires = self.get_expiration_time(app, session)
+        val = self.get_serializer(app).dumps(dict(session))
+        response.set_cookie(app.session_cookie_name, val,
+                            expires=expires, httponly=True,
+                            domain=domain)
+
+
 def matchmake(lecture):
 
     # SHIIIEEET BLACK BOX ALGORITHM BRO
@@ -239,7 +287,7 @@ def createPad(user,course,lecture):
     db.session.add(newNote)
     db.session.commit()
     pad.createGroupPad(newNote.lecture.groupID, newNote.id)
-    newNote.url = 'http://pad.notability.org:9001/p/' + lecture.groupID + "$" + str(newNote.id)
+    newNote.url = 'http://goombastomp.cloudfoundry.com/p/' + lecture.groupID + "$" + str(newNote.id)
     db.session.commit()
 
     return newNote
@@ -282,22 +330,40 @@ def before_request():
 # Routing for your application.
 ###
 
+@app.errorhandler(OAuthException)
+def handle_oauth_exception(error):
+    # return an appropriate response
+    print error.data
+    print error.message
+    print error.type
+    return ':('
+
 @app.route('/')
 def index():
     """Render website's home page."""
+    session['blah']='test'
     return render_template('index.html')
 
 @app.route('/login')
-def facebook_login():
-    print 'hello'
-    fid = request.args['fid']
-    print 'assigning cookie', fid
-    session['fid'] = fid
-    print 'session assigned to:', session['fid']
-    print 'modified? ',session.modified
-    print 'new?', session.new
-    session.modified = True
-    checkUser = db.session.query(User).filter(User.fid==fid).all()
+def login():
+    session['hi']="What's wrong?"
+    return facebook.authorize(callback=url_for('facebook_authorized',
+        next=request.args.get('next') or request.referrer or None,
+        _external=True))
+
+@app.route('/login/authorized')
+@facebook.authorized_handler
+def facebook_authorized(resp):
+    if resp is None:
+        error = 'Access denied: reason=%s error=%s' %(
+            request.args['error_reason'],
+            request.args['error_descriptions']
+        )
+        return render_template('home.html', error=error)
+    xyz = (resp['access_token'], '')
+    session['oauth_token'] = xyz
+    me = facebook.get('/me')
+    checkUser = db.session.query(User).filter(User.fid==me.data['id']).all()
     if not checkUser:
         fname = request.args['name'].split()[0]
         lname = request.args['name'].split()[-1]
@@ -563,6 +629,8 @@ def page_not_found(error):
     """Custom 404 page."""
     return render_template('404.html'), 404
 
+
+app.session_interface = ItsdangerousSessionInterface()
 
 if __name__ == '__main__':
     app.run(debug=True)
