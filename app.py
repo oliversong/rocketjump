@@ -48,8 +48,8 @@ app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
 
 app.config['DEBUG'] = DEBUG
 app.config['SECRET_KEY'] = SECRET_KEY
-app.config['SESSION_COOKIE_DOMAIN'] = 'www.notability.org'
-# app.config['SERVER_NAME'] = 'www.notability.org'
+# app.config['SESSION_COOKIE_DOMAIN'] = '.notability.org'
+# app.config['SERVER_NAME'] = 'notability.org'
 oauth = OAuth()
 db = SQLAlchemy(app)
 
