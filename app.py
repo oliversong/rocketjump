@@ -43,6 +43,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/rocketjumpdb'
 app.debug = DEBUG
 app.secret_key = SECRET_KEY
+app.SESSION_COOKIE_DOMAIN = 'www.notability.org'
 app.SERVER_NAME = 'notability.org'
 oauth = OAuth()
 db = SQLAlchemy(app)
@@ -578,5 +579,4 @@ def page_not_found(error):
 
 
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port)
+    app.run(DEBUG=True)
