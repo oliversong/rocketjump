@@ -25,11 +25,13 @@ SECRET_KEY = "devopsborat"
 # facebook api connection
 FACEBOOK_APP_ID = '124499577716801'
 FACEBOOK_APP_SECRET = '8f3dc21d612f5ef19dbc98221e1c7a0d'
+# FACEBOOK_APP_ID = '136661329828261'
+# FACEBOOK_APP_SECRET = 'd5be13df741b358d10a26aceeeff5dd0'
 
 # etherpad api connection
 apiKey = "qSoNop1JjHxPQcJkv3L5rrmgBrqNgC1t"
 # local
-#pad = EtherpadLiteClient(apiKey,'http://0.0.0.0:9001/api')
+# pad = EtherpadLiteClient(apiKey,'http://0.0.0.0:9001/api')
 # remote
 pad = EtherpadLiteClient(apiKey,'http://goombastomp.cloudfoundry.com/api')
 
@@ -38,7 +40,7 @@ app = Flask(__name__)
 #heroku
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
 #local
-#app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/rocketjumpdb'
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/rocketjumpdb'
 app.debug = DEBUG
 app.secret_key = SECRET_KEY
 oauth = OAuth()
@@ -59,7 +61,7 @@ facebook = oauth.remote_app('facebook',
     authorize_url='https://www.facebook.com/dialog/oauth',
     consumer_key=FACEBOOK_APP_ID,
     consumer_secret=FACEBOOK_APP_SECRET,
-    request_token_params={'scope':'email,user_birthday,user_education_history,user_location,user_photos,publish_actions'}
+    request_token_params={'scope':'email,user_birthday,user_education_history,user_photos,publish_actions'}
     )
 
 # many to many relationships
