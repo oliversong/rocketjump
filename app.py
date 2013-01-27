@@ -35,30 +35,30 @@ apiKey = "qSoNop1JjHxPQcJkv3L5rrmgBrqNgC1t"
 app = Flask(__name__)
 
 # local configs
-FACEBOOK_APP_ID = '136661329828261'
-FACEBOOK_APP_SECRET = 'd5be13df741b358d10a26aceeeff5dd0'
-DOMAIN = '.testability.org'
-pad = EtherpadLiteClient(apiKey,'http://0.0.0.0:9001/api')
-padURL = 'http://pad.testability.org:9001/p/'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/rocketjumpdb'
-app.config['REDIS_HOST'] = 'localhost'
-app.config['REDIS_PORT'] = 6379
-app.config['REDIS_DB'] = 0
-app.config['REDIS_PASSWORD'] = None
-
-# heroku configs
-# FACEBOOK_APP_ID = '124499577716801'
-# FACEBOOK_APP_SECRET = '8f3dc21d612f5ef19dbc98221e1c7a0d'
-# DOMAIN = '.notability.org'
-# pad = EtherpadLiteClient(apiKey,'http://goombastomp.cloudfoundry.com/api')
-# padURL = 'http://goombastomp.cloudfoundry.com/p/'
-# app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
-# redisURL = os.environ['REDISTOGO_URL']
-# o = urlparse(redisURL)
-# app.config['REDIS_HOST'] = o.hostname
-# app.config['REDIS_PORT'] = o.port 
+# FACEBOOK_APP_ID = '136661329828261'
+# FACEBOOK_APP_SECRET = 'd5be13df741b358d10a26aceeeff5dd0'
+# DOMAIN = '.testability.org'
+# pad = EtherpadLiteClient(apiKey,'http://0.0.0.0:9001/api')
+# padURL = 'http://pad.testability.org:9001/p/'
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/rocketjumpdb'
+# app.config['REDIS_HOST'] = 'localhost'
+# app.config['REDIS_PORT'] = 6379
 # app.config['REDIS_DB'] = 0
 # app.config['REDIS_PASSWORD'] = None
+
+# heroku configs
+FACEBOOK_APP_ID = '124499577716801'
+FACEBOOK_APP_SECRET = '8f3dc21d612f5ef19dbc98221e1c7a0d'
+DOMAIN = '.notability.org'
+pad = EtherpadLiteClient(apiKey,'http://goombastomp.cloudfoundry.com/api')
+padURL = 'http://goombastomp.cloudfoundry.com/p/'
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
+redisURL = os.environ['REDISTOGO_URL']
+o = urlparse(redisURL)
+app.config['REDIS_HOST'] = o.hostname
+app.config['REDIS_PORT'] = o.port 
+app.config['REDIS_DB'] = 0
+app.config['REDIS_PASSWORD'] = None
 # app.config['SESSION_COOKIE_DOMAIN'] = 'notability.org'
 # app.config['SERVER_NAME'] = 'www.notability.org'
 
