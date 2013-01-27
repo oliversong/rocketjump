@@ -384,11 +384,9 @@ def facebook_authorized(resp):
         db.session.commit()
     return 'hi' 
 
-'''
 @facebook.tokengetter
 def get_facebook_oauth_token():
     return session.get('oauth_token')
-'''
 
 @app.route('/logout')
 def logout():
