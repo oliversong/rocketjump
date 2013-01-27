@@ -283,6 +283,14 @@ def before_request():
 # Routing for your application.
 ###
 
+@app.errorhandler(OAuthException)
+def handle_oauth_exception(error):
+    # return an appropriate response
+    print error.data
+    print error.message
+    print error.type
+    return 'what'
+
 @app.route('/')
 def index():
     """Render website's home page."""
