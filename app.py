@@ -399,7 +399,7 @@ def login():
 def facebook_authorized(resp):
     print "at login/authorized"
     print session['hi']
-   if resp is None:
+    if resp is None:
         error = 'Access denied: reason=%s error=%s' %(
             request.args['error_reason'],
             request.args['error_descriptions']
