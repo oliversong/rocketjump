@@ -8,17 +8,20 @@
 """
 
 from __future__ import with_statement
-import  time, os
+import  time, os, pickle
 from flask import Flask, render_template, request, redirect, url_for, abort, g, flash, escape, session, make_response
 from werkzeug import check_password_hash, generate_password_hash
-from datetime import datetime
+from datetime import datetime, timedelta
 from flask_oauth import OAuth, OAuthException
 from flask.ext.sqlalchemy import SQLAlchemy
 from sqlalchemy import desc
 from py_etherpad import EtherpadLiteClient
 from werkzeug.datastructures import CallbackDict
 from flask.sessions import SessionInterface, SessionMixin
-from itsdangerous import URLSafeTimedSerializer, BadSignature
+from uuid import uuid4
+from redis import Redis
+from urlparse import urlparse
+
 
 # config
 DEBUG = True
@@ -32,22 +35,32 @@ apiKey = "qSoNop1JjHxPQcJkv3L5rrmgBrqNgC1t"
 app = Flask(__name__)
 
 # local configs
-# FACEBOOK_APP_ID = '136661329828261'
-# FACEBOOK_APP_SECRET = 'd5be13df741b358d10a26aceeeff5dd0'
-# DOMAIN = '.testability.org'
-# pad = EtherpadLiteClient(apiKey,'http://0.0.0.0:9001/api')
-# padURL = 'http://pad.testability.org:9001/p/'
-# app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/rocketjumpdb'
+FACEBOOK_APP_ID = '136661329828261'
+FACEBOOK_APP_SECRET = 'd5be13df741b358d10a26aceeeff5dd0'
+DOMAIN = '.testability.org'
+pad = EtherpadLiteClient(apiKey,'http://0.0.0.0:9001/api')
+padURL = 'http://pad.testability.org:9001/p/'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/rocketjumpdb'
+app.config['REDIS_HOST'] = 'localhost'
+app.config['REDIS_PORT'] = 6379
+app.config['REDIS_DB'] = 0
+app.config['REDIS_PASSWORD'] = None
 
 # heroku configs
-FACEBOOK_APP_ID = '124499577716801'
-FACEBOOK_APP_SECRET = '8f3dc21d612f5ef19dbc98221e1c7a0d'
-DOMAIN = '.notability.org'
-pad = EtherpadLiteClient(apiKey,'http://goombastomp.cloudfoundry.com/api')
-padURL = 'http://goombastomp.cloudfoundry.com/p/'
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
+# FACEBOOK_APP_ID = '124499577716801'
+# FACEBOOK_APP_SECRET = '8f3dc21d612f5ef19dbc98221e1c7a0d'
+# DOMAIN = '.notability.org'
+# pad = EtherpadLiteClient(apiKey,'http://goombastomp.cloudfoundry.com/api')
+# padURL = 'http://goombastomp.cloudfoundry.com/p/'
+# app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
+# redisURL = os.environ['REDISTOGO_URL']
+# o = urlparse(redisURL)
+# app.config['REDIS_HOST'] = o.hostname
+# app.config['REDIS_PORT'] = o.port 
+# app.config['REDIS_DB'] = 0
+# app.config['REDIS_PASSWORD'] = None
 # app.config['SESSION_COOKIE_DOMAIN'] = 'notability.org'
-app.config['SERVER_NAME'] = 'www.notability.org'
+# app.config['SERVER_NAME'] = 'www.notability.org'
 
 app.config['DEBUG'] = DEBUG
 app.config['SECRET_KEY'] = SECRET_KEY
@@ -70,6 +83,78 @@ facebook = oauth.remote_app('facebook',
     consumer_secret=FACEBOOK_APP_SECRET,
     request_token_params={'scope':'email,user_birthday,user_education_history,user_photos,publish_actions'}
     )
+
+# redis sessions
+
+def init_redis(app):
+    """Initializes Redis client from app config"""
+
+    app.config.setdefault('REDIS_HOST', 'localhost')
+    app.config.setdefault('REDIS_PORT', 6379)
+    app.config.setdefault('REDIS_DB', 0)
+    app.config.setdefault('REDIS_PASSWORD', None)
+
+    return Redis(host=app.config['REDIS_HOST'],
+                       port=app.config['REDIS_PORT'],
+                       db=app.config['REDIS_DB'],
+                       password=app.config['REDIS_PASSWORD'])
+
+class RedisSession(CallbackDict, SessionMixin):
+
+    def __init__(self, initial=None, sid=None, new=False):
+        def on_update(self):
+            self.modified = True
+        CallbackDict.__init__(self, initial, on_update)
+        self.sid = sid
+        self.new = new
+        self.modified = False
+
+
+class RedisSessionInterface(SessionInterface):
+    serializer = pickle
+    session_class = RedisSession
+
+    def __init__(self, redis=None, prefix='session:'):
+        if redis is None:
+            redis = Redis()
+        self.redis = redis
+        self.prefix = prefix
+
+    def generate_sid(self):
+        return str(uuid4())
+
+    def get_redis_expiration_time(self, app, session):
+        if session.permanent:
+            return app.permanent_session_lifetime
+        return timedelta(days=1)
+
+    def open_session(self, app, request):
+        sid = request.cookies.get(app.session_cookie_name)
+        if not sid:
+            sid = self.generate_sid()
+            return self.session_class(sid=sid)
+        val = self.redis.get(self.prefix + sid)
+        if val is not None:
+            data = self.serializer.loads(val)
+            return self.session_class(data, sid=sid)
+        return self.session_class(sid=sid, new=True)
+
+    def save_session(self, app, session, response):
+        domain = self.get_cookie_domain(app)
+        if not session:
+            self.redis.delete(self.prefix + session.sid)
+            if session.modified:
+                response.delete_cookie(app.session_cookie_name,
+                                       domain=domain)
+            return
+        redis_exp = self.get_redis_expiration_time(app, session)
+        cookie_exp = self.get_expiration_time(app, session)
+        val = self.serializer.dumps(dict(session))
+        self.redis.setex(self.prefix + session.sid, val,
+                         int(redis_exp.total_seconds()))
+        response.set_cookie(app.session_cookie_name, session.sid,
+                            expires=cookie_exp, httponly=True,
+                            domain=domain)
 
 # many to many relationships
 
@@ -225,53 +310,6 @@ class Asset(db.Model):
 
     def __repr__(self):
         return '<Asset %r>' % self.location
-
-class ItsdangerousSession(CallbackDict, SessionMixin):
-
-    def __init__(self, initial=None):
-        def on_update(self):
-            self.modified = True
-        CallbackDict.__init__(self, initial, on_update)
-        self.modified = False
-
-
-class ItsdangerousSessionInterface(SessionInterface):
-    salt = 'cookie-session'
-    session_class = ItsdangerousSession
-
-    def get_serializer(self, app):
-        if not app.secret_key:
-            return None
-        return URLSafeTimedSerializer(app.secret_key, 
-                                      salt=self.salt)
-
-    def open_session(self, app, request):
-        s = self.get_serializer(app)
-        if s is None:
-            return None
-        val = request.cookies.get(app.session_cookie_name)
-        if not val:
-            return self.session_class()
-        max_age = app.permanent_session_lifetime.total_seconds()
-        try:
-            data = s.loads(val, max_age=max_age)
-            return self.session_class(data)
-        except BadSignature:
-            return self.session_class()
-
-    def save_session(self, app, session, response):
-        domain = self.get_cookie_domain(app)
-        if not session:
-            if session.modified:
-                response.delete_cookie(app.session_cookie_name,
-                                   domain=domain)
-            return
-        expires = self.get_expiration_time(app, session)
-        val = self.get_serializer(app).dumps(dict(session))
-        response.set_cookie(app.session_cookie_name, val,
-                            expires=expires, httponly=True,
-                            domain=domain)
-
 
 def matchmake(lecture):
 
@@ -636,8 +674,11 @@ def page_not_found(error):
     """Custom 404 page."""
     return render_template('404.html'), 404
 
-
-app.session_interface = ItsdangerousSessionInterface()
+redisInst = Redis(host=app.config['REDIS_HOST'],
+                       port=app.config['REDIS_PORT'],
+                       db=app.config['REDIS_DB'],
+                       password=app.config['REDIS_PASSWORD'])
+app.session_interface = RedisSessionInterface(redisInst)
 
 if __name__ == '__main__':
     app.run(debug=True)
