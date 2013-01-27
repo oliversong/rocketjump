@@ -46,7 +46,7 @@ DOMAIN = '.notability.org'
 pad = EtherpadLiteClient(apiKey,'http://goombastomp.cloudfoundry.com/api')
 padURL = 'http://goombastomp.cloudfoundry.com/p/'
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
-app.config['SESSION_COOKIE_DOMAIN'] = '.notability.org'
+# app.config['SESSION_COOKIE_DOMAIN'] = '.notability.org'
 # app.config['SERVER_NAME'] = 'notability.org'
 
 app.config['DEBUG'] = DEBUG
