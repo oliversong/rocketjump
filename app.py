@@ -19,7 +19,7 @@ from py_etherpad import EtherpadLiteClient
 from werkzeug.datastructures import CallbackDict
 from flask.sessions import SessionInterface, SessionMixin
 from uuid import uuid4
-from redis import Redis
+from redis import Redis, from_url
 from urlparse import urlparse
 
 
@@ -53,14 +53,7 @@ DOMAIN = '.notability.org'
 pad = EtherpadLiteClient(apiKey,'http://goombastomp.cloudfoundry.com/api')
 padURL = 'http://goombastomp.cloudfoundry.com/p/'
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
-redisURL = os.environ['REDISTOGO_URL']
-o = urlparse(redisURL)
-print "hostname: ",o.hostname
-print "port: ",o.port
-app.config['REDIS_HOST'] = o.hostname
-app.config['REDIS_PORT'] = '9235'
-app.config['REDIS_DB'] = 0
-app.config['REDIS_PASSWORD'] = o.password
+app.config['REDIS_URL'] = os.environ['REDISTOGO_URL']
 # app.config['SESSION_COOKIE_DOMAIN'] = 'notability.org'
 # app.config['SERVER_NAME'] = 'www.notability.org'
 
@@ -676,10 +669,7 @@ def page_not_found(error):
     """Custom 404 page."""
     return render_template('404.html'), 404
 
-redisInst = Redis(host=app.config['REDIS_HOST'],
-                       port=app.config['REDIS_PORT'],
-                       db=app.config['REDIS_DB'],
-                       password=app.config['REDIS_PASSWORD'])
+redisInst = from_url(app.config['REDIS_URL'])
 app.session_interface = RedisSessionInterface(redisInst)
 
 if __name__ == '__main__':
