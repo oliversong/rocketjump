@@ -1,3 +1,6 @@
+access_logs
+error_logs
+
 # Virtualenv
 env
 .Python
