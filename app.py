@@ -43,10 +43,13 @@ app.wsgi_app = ProxyFix(app.wsgi_app)
 # EC2
 FACEBOOK_APP_ID = '124499577716801'
 FACEBOOK_APP_SECRET = '8f3dc21d612f5ef19dbc98221e1c7a0d'
-DOMAIN = '.notability.org'
-pad = EtherpadLiteClient(apiKey,'http://pad.notability.org/api')
-padURL = 'http://pad.notability.org/p/'
+DOMAIN = '.cloudfoundry.com'
+pad = EtherpadLiteClient(apiKey,'http://goombastomp.cloudfoundry.com/api')
+padURL = 'http://goombastomp.cloudfoundry.com/p/'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://hello:shoopdawoop@localhost/rocketjumpdb'
+# pad = EtherpadLiteClient(apiKey,'http://pad.notability.org/api')
+# DOMAIN = '.notability.org'
+# padURL = 'http://pad.notability.org/p/'
 
 app.config['DEBUG'] = DEBUG
 app.config['SECRET_KEY'] = SECRET_KEY
