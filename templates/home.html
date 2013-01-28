@@ -1,5 +1,9 @@
 {% extends "layout.html" %}
 
+{% block title %}
+Home
+{% endblock %}
+
 {% block body %}
 <div class="showcase2">
 	<div class="container">
@@ -113,12 +117,12 @@
 <div id="helloThere" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
   <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-    <h3 id="myModalLabel">Hi there!</h3>
+    <h2 id="myModalLabel">Welcome to Notability!</h2>
   </div>
   <div class="modal-body">
-    <p>Welcome to Notability. What do you want to do?</p>
-    <button class="meetNewPeople">Meet new people</button><button class="meetSpecial">Meet someone special</button>
-    <small>Don't worry, you can change this in your settings later</small>
+    <p>Choose your intent:</p>
+    <button class="meetNewPeople"></button><button class="meetSpecial"></button><br /><br />
+    <small>(Don't worry, you can change this in your settings later)</small>
   </div>
 </div>
 

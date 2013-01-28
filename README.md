@@ -7,7 +7,6 @@ Ruby is too confusing.
 ### TODO
 * Matchmaker algorithm (gender)
 * Reroll your partner?
-* Settings (gender prefs)
 * Initial "Are you in this course?"
 * Close this note correctly
 * Don't make duplicate notes or route to other people's notes
@@ -34,3 +33,4 @@ Ruby is too confusing.
 11. Dataset 
 12. Autocomplete
 13. Caching thing dafuq
+14. Settings (gender prefs)

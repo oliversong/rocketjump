@@ -1,7 +1,7 @@
 <header>
     <div class="container">
         <div class="row inheader">
-            <a href="{{ url_for('index') }}">
+            <a href="{% if g.user %}{{ url_for('home') }}{% else %}{{ url_for('index') }}{% endif %}">
                 <div class="span2 logo"></div>
             </a>
         	{% if g.user %}
