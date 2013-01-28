@@ -5,16 +5,14 @@ Ruby is too confusing.
 ==============
 
 ### TODO
-* Dataset 
-* Autocomplete
-* Matchmaker algorithm
+* Matchmaker algorithm (gender)
 * Reroll your partner?
-* Settings
+* Settings (gender prefs)
 * Initial "Are you in this course?"
 * Close this note correctly
 * Don't make duplicate notes or route to other people's notes
 * Fix node.js styling
-* Caching thing
+* Caching thing dafuq
 * Analytics
 	* How many people are queued
 	* How many people are taking notes
@@ -34,3 +32,5 @@ Ruby is too confusing.
 8. Implement design
 9. Setup real node.js db and deploy to nodejitsu
 10. Cookie authentication
+11. Dataset 
+12. Autocomplete
