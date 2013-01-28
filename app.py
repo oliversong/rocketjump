@@ -54,8 +54,8 @@ pad = EtherpadLiteClient(apiKey,'http://goombastomp.cloudfoundry.com/api')
 padURL = 'http://goombastomp.cloudfoundry.com/p/'
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
 app.config['REDIS_URL'] = os.environ['REDISTOGO_URL']
-app.config['SESSION_COOKIE_DOMAIN'] = 'www.notability.org'
-app.config['SERVER_NAME'] = 'www.notability.org'
+# app.config['SESSION_COOKIE_DOMAIN'] = 'www.notability.org'
+# app.config['SERVER_NAME'] = 'www.notability.org'
 
 app.config['DEBUG'] = DEBUG
 app.config['SECRET_KEY'] = SECRET_KEY
