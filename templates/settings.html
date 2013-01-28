@@ -2,6 +2,13 @@
 
 {% block body %}
 <div class="showcase2">
+	<div class='container'>
+		<div class="row welcome">
+			<div class="span12 hello textcenter">
+				<h1>Account Settings</h1>
+			</div>
+		</div>
+	</div>
 </div>
 <div class="orangebar"></div>
 <div class="uppercontain">
@@ -21,28 +28,31 @@
 	<div class="container">
 		<form action="{{ url_for('prefupdate') }}" method=get>
 			<fieldset>
-				<legend>Account Settings</legend>
-				<label>Intent</label>
+				<legend>Intent</legend>
 				<label class="radio">
 					<input type="radio" name='intent' value="meetnew" {% if g.user.intent=='meetnew' %} checked {% endif %}>Meet new people - We try to match you up with someone you don't know, so you can make a new friend or network.
 				</label>
 				<label class="radio">
 					<input type="radio" name='intent' value="special" {% if g.user.intent=='special' %} checked {% endif %}>Meet someone special - We try to match you up with someone you potentially might be interested in.
 				</label>
-				<label>Gender</label>
+				<br /><br />
+				<legend>Gender</legend>
 				<label class="radio inline">
 					<input type="radio" name='gender' value='male' {% if g.user.gender=='male' %} checked {% endif %}>Male
 				</label>
 				<label class="radio inline">
 					<input type="radio" name='gender' value='female' {% if g.user.gender=='female' %} checked {% endif %}>Female
 				</label>
-				<label>Looking for</label>
+				<br /><br /><br />
+				<legend>Looking for</legend>
 				<label class="checkbox inline">
-					<input type="radio" name='interested' value='male' {% if g.user.interested_in=='male' %} checked {% endif %}>Male
+					<input type="checkbox" name='interested' value='male' {% if g.user.interested_in=='male' or 'either' %} checked {% endif %}>Male
 				</label>
 				<label class="checkbox inline">
-					<input type="radio" name='interested' value='female' {% if g.user.interested_in=='female' %} checked {% endif %}>Female
+					<input type="checkbox" name='interested' value='female' {% if g.user.interested_in=='female' or 'either' %} checked {% endif %}>Female
 				</label>
+				<br /><br />
+				<br /><br />
 			    <button type="submit" class="btn btn-info">Save Preferences</button>
 			</fieldset>
 		</form>

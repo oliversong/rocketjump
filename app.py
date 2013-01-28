@@ -32,22 +32,22 @@ app = Flask(__name__)
 app.wsgi_app = ProxyFix(app.wsgi_app)
 
 # local configs
-# apiKey = "qSoNop1JjHxPQcJkv3L5rrmgBrqNgC1t"
-# FACEBOOK_APP_ID = '136661329828261'
-# FACEBOOK_APP_SECRET = 'd5be13df741b358d10a26aceeeff5dd0'
-# DOMAIN = '.testability.org'
-# pad = EtherpadLiteClient(apiKey,'http://0.0.0.0:9001/api')
-# padURL = 'http://pad.testability.org:9001/p/'
-# app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/rocketjumpdb'
+apiKey = "qSoNop1JjHxPQcJkv3L5rrmgBrqNgC1t"
+FACEBOOK_APP_ID = '136661329828261'
+FACEBOOK_APP_SECRET = 'd5be13df741b358d10a26aceeeff5dd0'
+DOMAIN = '.testability.org'
+pad = EtherpadLiteClient(apiKey,'http://0.0.0.0:9001/api')
+padURL = 'http://pad.testability.org:9001/p/'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/rocketjumpdb'
 
 # EC2
-apiKey = "shoopdawoop"
-FACEBOOK_APP_ID = '124499577716801'
-FACEBOOK_APP_SECRET = '8f3dc21d612f5ef19dbc98221e1c7a0d'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://hello:shoopdawoop@localhost/rocketjumpdb'
-pad = EtherpadLiteClient(apiKey,'http://pad.notability.org/api')
-DOMAIN = '.notability.org'
-padURL = 'http://pad.notability.org/p/'
+# apiKey = "shoopdawoop"
+# FACEBOOK_APP_ID = '124499577716801'
+# FACEBOOK_APP_SECRET = '8f3dc21d612f5ef19dbc98221e1c7a0d'
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://hello:shoopdawoop@localhost/rocketjumpdb'
+# pad = EtherpadLiteClient(apiKey,'http://pad.notability.org/api')
+# DOMAIN = '.notability.org'
+# padURL = 'http://pad.notability.org/p/'
 
 app.config['DEBUG'] = DEBUG
 app.config['SECRET_KEY'] = SECRET_KEY
@@ -412,13 +412,19 @@ def facebook_authorized(resp):
         email = me.data['email']
         username = me.data['username']
         gender = me.data['gender']
-        interested = me.data['interested_in']
-        if len(interested)==2:
-            interested = "either"
-        elif "male" in interested:
-            interested = "male"
-        elif "female" in interested:
-            interested = "female"
+        if 'interested_in' in me.data:
+            interested = me.data['interested_in']
+            if len(interested)==2:
+                interested = "either"
+            elif "male" in interested:
+                interested = "male"
+            elif "female" in interested:
+                interested = "female"
+        else:
+            if gender=='male':
+                interested='female'
+            else:
+                interested='male'
         print fid, fname, lname, gender, interested, email, username, education
         newuser = User(fid, fname, lname, gender, interested, email, username, education)
         db.session.add(newuser)
@@ -440,7 +446,7 @@ def logout():
     resp.set_cookie('sessionID', '', expires=0, domain=DOMAIN)
     return resp
 
-@app.route('/settings/', method=['GET','POST'])
+@app.route('/settings/')
 def settings():
     if 'fid' not in session:
         flash('Please sign in.')
@@ -454,11 +460,17 @@ def prefupdate():
         return redirect(url_for('index'))
     intent = request.args['intent']
     gender = request.args['gender']
-    interested_in = request.args['interested']
+    interested_in = request.args.getlist('interested')
+    print interested_in
     g.user.intent = intent
     g.user.gender = gender
+    if len(interested_in)==2:
+        interested_in = 'either'
+    else:
+        interested_in = interested_in[0]
     g.user.interested_in = interested_in
     db.session.commit()
+    flash('Your new settings have been saved.')
     return redirect(url_for('home'))
 
 
@@ -486,9 +498,9 @@ def home():
             unclosed.append(x)
     return render_template('home.html', collaborators=collabs, suggested=suggested, unclosed=unclosed, new=g.user.just_created)
 
-@app.route('/intent')
+@app.route('/intent', methods=['POST'])
 def intent():
-    intent = request.args['intent']
+    intent = request.form['intent']
     g.user.intent = intent
     g.user.just_created = False
     db.session.commit()

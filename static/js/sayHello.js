@@ -11,7 +11,7 @@
       intent: 'meetnew'
     };
     return $.post('/intent', data, function(d, st, xr) {
-      return $('#myModal').modal('hide');
+      return $('#helloThere').modal('hide');
     });
   });
 
@@ -21,7 +21,7 @@
       intent: 'special'
     };
     return $.post('/intent', data, function(d, st, xr) {
-      return $('#myModal').modal('hide');
+      return $('#helloThere').modal('hide');
     });
   });
 
