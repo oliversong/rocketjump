@@ -6,9 +6,8 @@
 
     6.470.
 """
-
 from __future__ import with_statement
-import  time, os
+import  time, os, sys 
 from flask import Flask, render_template, request, redirect, url_for, abort, g, flash, escape, session, make_response
 from werkzeug import check_password_hash, generate_password_hash
 from datetime import datetime
@@ -16,6 +15,7 @@ from flask_oauth import OAuth, OAuthException
 from flask.ext.sqlalchemy import SQLAlchemy
 from sqlalchemy import desc
 from py_etherpad import EtherpadLiteClient
+from werkzeug.contrib.fixers import ProxyFix
 from werkzeug.datastructures import CallbackDict
 from flask.sessions import SessionInterface, SessionMixin
 from itsdangerous import URLSafeTimedSerializer, BadSignature
@@ -30,6 +30,7 @@ apiKey = "qSoNop1JjHxPQcJkv3L5rrmgBrqNgC1t"
 
 # make app
 app = Flask(__name__)
+app.wsgi_app = ProxyFix(app.wsgi_app)
 
 # local configs
 # FACEBOOK_APP_ID = '136661329828261'
@@ -37,17 +38,17 @@ app = Flask(__name__)
 # DOMAIN = '.testability.org'
 # pad = EtherpadLiteClient(apiKey,'http://0.0.0.0:9001/api')
 # padURL = 'http://pad.testability.org:9001/p/'
-# app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/rocketjumpdb'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/rocketjump'
 
 # heroku configs
 FACEBOOK_APP_ID = '124499577716801'
 FACEBOOK_APP_SECRET = '8f3dc21d612f5ef19dbc98221e1c7a0d'
 DOMAIN = '.notability.org'
-pad = EtherpadLiteClient(apiKey,'http://goombastomp.cloudfoundry.com/api')
-padURL = 'http://goombastomp.cloudfoundry.com/p/'
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
+pad = EtherpadLiteClient(apiKey,'http://pad.notability.org/api')
+padURL = 'http://pad.notability.org/p/'
+#app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
 # app.config['SESSION_COOKIE_DOMAIN'] = 'notability.org'
-app.config['SERVER_NAME'] = 'www.notability.org'
+# app.config['SERVER_NAME'] = 'www.notability.org'
 
 app.config['DEBUG'] = DEBUG
 app.config['SECRET_KEY'] = SECRET_KEY
@@ -348,6 +349,7 @@ def handle_oauth_exception(error):
 @app.route('/')
 def index():
     """Render website's home page."""
+    session['hi']='hi'
     return render_template('index.html')
 
 @app.route('/login')
