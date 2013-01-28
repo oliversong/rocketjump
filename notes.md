@@ -84,6 +84,23 @@ Starting the server:
 
 	foreman start
 
+
+## EC2 setup with postgresql, flask, gunicorn, and nginx
+
+Start:
+
+	PYTHONPATH=/home/ubuntu/rocketjump/venv/lib/python2.7/site-packages gunicorn --access-logfile=access_logs --error-logfile=error_logs -D app:app 
+
+Stop:
+
+	ps -ax | grep gunicorn
+	kill [pid]
+
+Nginx reload:
+
+	sudo nginx -s reload
+
+
 ## Game plan
 
 Let's use the etherpad lite api to supply group note taking services. We can hook it up to the application with the pyetherpadlite client library. So far so good. We'll have to host our own etherpadlite server (nodejitsu?). After that we 

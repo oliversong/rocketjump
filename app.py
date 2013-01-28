@@ -38,17 +38,15 @@ app.wsgi_app = ProxyFix(app.wsgi_app)
 # DOMAIN = '.testability.org'
 # pad = EtherpadLiteClient(apiKey,'http://0.0.0.0:9001/api')
 # padURL = 'http://pad.testability.org:9001/p/'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/rocketjump'
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/rocketjumpdb'
 
-# heroku configs
+# EC2
 FACEBOOK_APP_ID = '124499577716801'
 FACEBOOK_APP_SECRET = '8f3dc21d612f5ef19dbc98221e1c7a0d'
 DOMAIN = '.notability.org'
 pad = EtherpadLiteClient(apiKey,'http://pad.notability.org/api')
 padURL = 'http://pad.notability.org/p/'
-#app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
-# app.config['SESSION_COOKIE_DOMAIN'] = 'notability.org'
-# app.config['SERVER_NAME'] = 'www.notability.org'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://hello:shoopdawoop@localhost/rocketjumpdb'
 
 app.config['DEBUG'] = DEBUG
 app.config['SECRET_KEY'] = SECRET_KEY
