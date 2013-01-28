@@ -92,7 +92,7 @@ facebook = oauth.remote_app('facebook',
     authorize_url='https://www.facebook.com/dialog/oauth',
     consumer_key=FACEBOOK_APP_ID,
     consumer_secret=FACEBOOK_APP_SECRET,
-    request_token_params={'scope':'email,user_birthday,user_education_history,user_photos,publish_actions'}
+    request_token_params={'scope':'email,user_birthday,user_education_history,user_photos,user_relationship_details,publish_actions'}
     )
 
 # many to many relationships
@@ -134,6 +134,10 @@ class User(db.Model):
     fname = db.Column(db.String(80))
     lname = db.Column(db.String(80))
     email = db.Column(db.String(120), unique=True)
+    gender = db.Column(db.String(80))
+    interested_in = db.Column(db.String(80))
+    just_created = db.Column(db.Boolean, default=True)
+    intent = db.Column(db.String(80))
     picurl = db.Column(db.String(120))
     spicurl = db.Column(db.String(120))
     courses = db.relationship('Course', secondary=courseTable, backref=db.backref('users', lazy='dynamic'))
@@ -144,11 +148,13 @@ class User(db.Model):
     sessionID = db.Column(db.String(120))
     college = db.Column(db.String(120))
 
-    def __init__(self, fid, fname, lname, email, username, college):
+    def __init__(self, fid, fname, lname, gender, interested, email, username, college):
         self.fid = fid
         self.fname = fname
         self.lname = lname
         self.email = email
+        self.gender = gender
+        self.interested_in = interested
         self.picurl = "http://graph.facebook.com/"+username+"/picture?width=200&height=200"
         self.spicurl = "https://graph.facebook.com/"+username+"/picture?type=square"
         self.authorID = pad.createAuthorIfNotExistsFor(fid,fname+' '+lname)['authorID']
@@ -405,8 +411,16 @@ def facebook_authorized(resp):
             education=me.data['education'][-1]['school']['name']
         email = me.data['email']
         username = me.data['username']
-        print fid, fname, lname, email, username, education
-        newuser = User(fid, fname, lname, email, username, education)
+        gender = me.data['gender']
+        interested = me.data['interested_in']
+        if len(interested)==2:
+            interested = "either"
+        elif "male" in interested:
+            interested = "male"
+        elif "female" in interested:
+            interested = "female"
+        print fid, fname, lname, gender, interested, email, username, education
+        newuser = User(fid, fname, lname, gender, interested, email, username, education)
         db.session.add(newuser)
         db.session.commit()
     print 'giving session token'
@@ -426,12 +440,27 @@ def logout():
     resp.set_cookie('sessionID', '', expires=0, domain=DOMAIN)
     return resp
 
-@app.route('/settings/')
+@app.route('/settings/', method=['GET','POST'])
 def settings():
     if 'fid' not in session:
         flash('Please sign in.')
         return redirect(url_for('index'))
     return render_template('settings.html')
+
+@app.route('/settings/update')
+def prefupdate():
+    if 'fid' not in session:
+        flash('Please sign in.')
+        return redirect(url_for('index'))
+    intent = request.args['intent']
+    gender = request.args['gender']
+    interested_in = request.args['interested']
+    g.user.intent = intent
+    g.user.gender = gender
+    g.user.interested_in = interested_in
+    db.session.commit()
+    return redirect(url_for('home'))
+
 
 @app.route('/home/')
 def home():
@@ -455,7 +484,15 @@ def home():
     for x in g.user.notes:
         if x.inProgress:
             unclosed.append(x)
-    return render_template('home.html', collaborators=collabs, suggested=suggested, unclosed=unclosed)
+    return render_template('home.html', collaborators=collabs, suggested=suggested, unclosed=unclosed, new=g.user.just_created)
+
+@app.route('/intent')
+def intent():
+    intent = request.args['intent']
+    g.user.intent = intent
+    g.user.just_created = False
+    db.session.commit()
+    return "Kewl"
 
 @app.route('/search')
 def search():

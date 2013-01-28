@@ -18,20 +18,6 @@ $('.finishbtn').click ()->
 		$.noop()
 		)
 
-///$('.noteName').click ()->
-	blah = $(this).text()
-	id = $(this).attr('noteid')
-	course = $(this).attr('coursename')
-	$(this).replaceWith('''<span class="replaceme"><input type="text" class="nameReplace" name="nameReplace" placeholder="'''+blah+'''
-		" />
-		<button class="btn btn-warning updateName">Update</button></span>
-		''')
-	$('.updateName').click ()->
-		newName = $('.nameReplace').val()
-		$.post('/'+course+'/'+id+'/updateName',{ name:newName },(d,st,xr)->
-			$('.replaceme')
-			)
-///
 window.inplace = (content)->
 	path = window.location.pathname
 	$.post(path+'/new',{newval:content},(d,st,xr)->

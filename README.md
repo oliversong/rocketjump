@@ -12,7 +12,6 @@ Ruby is too confusing.
 * Close this note correctly
 * Don't make duplicate notes or route to other people's notes
 * Fix node.js styling
-* Caching thing dafuq
 * Analytics
 	* How many people are queued
 	* How many people are taking notes
@@ -34,3 +33,4 @@ Ruby is too confusing.
 10. Cookie authentication
 11. Dataset 
 12. Autocomplete
+13. Caching thing dafuq

@@ -1,5 +1,51 @@
 {% extends "layout.html" %}
 
 {% block body %}
-Settings!
+<div class="showcase2">
+</div>
+<div class="orangebar"></div>
+<div class="uppercontain">
+	<div class="container">
+		<div class="row">
+			<div class="span2 profilePic" style="background-image:url({{ g.user.picurl }});"></div>
+			<div class="span3 userstats">
+				<div style="margin-top:5px;font-size:1.5em;font-family:Edelsans;">{{ g.user.fname }} {{ g.user.lname }}</div>
+				{{ g.user.college }}<br />
+				{{ g.user.courses|count }} Courses<br />
+				{{ g.user.notes|count }} Notes<br />
+				{{ collaborators|count }} Collaborators
+			</div>
+	</div>
+</div>
+<div class="lowercontain">
+	<div class="container">
+		<form action="{{ url_for('prefupdate') }}" method=get>
+			<fieldset>
+				<legend>Account Settings</legend>
+				<label>Intent</label>
+				<label class="radio">
+					<input type="radio" name='intent' value="meetnew" {% if g.user.intent=='meetnew' %} checked {% endif %}>Meet new people - We try to match you up with someone you don't know, so you can make a new friend or network.
+				</label>
+				<label class="radio">
+					<input type="radio" name='intent' value="special" {% if g.user.intent=='special' %} checked {% endif %}>Meet someone special - We try to match you up with someone you potentially might be interested in.
+				</label>
+				<label>Gender</label>
+				<label class="radio inline">
+					<input type="radio" name='gender' value='male' {% if g.user.gender=='male' %} checked {% endif %}>Male
+				</label>
+				<label class="radio inline">
+					<input type="radio" name='gender' value='female' {% if g.user.gender=='female' %} checked {% endif %}>Female
+				</label>
+				<label>Looking for</label>
+				<label class="checkbox inline">
+					<input type="radio" name='interested' value='male' {% if g.user.interested_in=='male' %} checked {% endif %}>Male
+				</label>
+				<label class="checkbox inline">
+					<input type="radio" name='interested' value='female' {% if g.user.interested_in=='female' %} checked {% endif %}>Female
+				</label>
+			    <button type="submit" class="btn btn-info">Save Preferences</button>
+			</fieldset>
+		</form>
+	</div>
+</div>
 {% endblock %}
