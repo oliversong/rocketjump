@@ -12388,13 +12388,13 @@
     {
       "type": "Class",
       "id": "6.S912",
-      "label": "Special Subject in Electrical Engineering and Computer Science",
-      "shortLabel": "Special Subject in EECS",
+      "label": "MIT Pokerbots Competitions",
+      "shortLabel": "Pokerbots Competition",
       "level": "Undergraduate",
       "total-units": 0,
       "units": "0-0-0",
       "course": "6",
-      "description": "Covers subject matter not offered in the regular curriculum.",
+      "description": "6.S912 or MIT Pokerbots is a computerized poker tournament. Teams have one month to program a completely autonomous pokerbot to compete against other teams. Competitors must learn and apply concepts in economics, mathematics, and computer science not normally developed together in academic settings in order to conquer their opponents and emerge victorious. This year's competition features over $30,000 in prizes and attention from the most prestigious technology and trading firms. This IAP, channel your programming ability and strategic quantitative thinking skills to become the reigning Pokerbots champion!",
       "prereqs": "Permission of instructor",
       "offering": "Y",
       "semester": [

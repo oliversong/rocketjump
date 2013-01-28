@@ -11,7 +11,7 @@
 		<div class="row noleftmargin">
 			<form action="{{ url_for('find') }}" method=post>
 				<div class="span5 offset3">
-					<input class="span5 search" placeholder="Find a class" type=text name=courseName>
+					<input class="span5 search findClass" data-provide="typeahead" placeholder="Find a class" type=text name=courseName>
 				</div>	
 				<input class="span2 searchbtn" type=submit value=''>
 			</form>
@@ -107,5 +107,5 @@
 		</div>
 	</div>
 </div>
-
+<script src="{{ url_for('static', filename='js/remote-typeahead.js') }}"></script>
 {% endblock %}
