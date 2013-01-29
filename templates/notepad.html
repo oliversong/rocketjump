@@ -29,7 +29,11 @@ Pad
 		</div>
 		<div class="row">
 			<div class="span12">
+				{% if not public %}
 				<iframe seamless='seamless' class='notepad' src="{% if not public %}{{ note.url }}{% else %}{{ note.rourl }}{% endif %}"></iframe>
+				{% else %}
+				{{ pad.dump }}
+				{% endif %}
 			</div>
 		</div>
 

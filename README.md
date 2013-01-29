@@ -7,7 +7,8 @@ Ruby is too confusing.
 ### TODO
 * Test/debug reroll
 * Test meet someone special side
-* Fix node.js styling
+* Remove macbook air logo
+* Make final graphics and put them in
 * Analytics
 	* How many people are queued
 	* How many people are taking notes
@@ -39,3 +40,4 @@ Ruby is too confusing.
 20. Public mode + read only
 21. disable then reenable domain forwarding godaddy fuck you
 22. Restrict + unlock public notes
+23. Fix node.js styling

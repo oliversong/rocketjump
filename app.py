@@ -215,6 +215,7 @@ class Note(db.Model):
     url = db.Column(db.String(300))
     padID = db.Column(db.String(120))
     rourl = db.Column(db.String(300))
+    dump = db.Column(db.String(10000))
     inProgress = db.Column(db.Boolean, default=False)
     liveCount = db.Column(db.Integer)
     sessionID = db.relationship('SessionID', backref='note', lazy='dynamic')
@@ -741,10 +742,11 @@ def done(coursename, noteid):
     note.lecture.live = result
     if public:
         note.public = True
-        note.roID = pad.getReadOnlyID(note.padID)['readOnlyID']
-        print 'setpublic ',pad.setPublicStatus(note.padID, 'true')
-        print 'getpublic ',pad.getPublicStatus(note.padID)
-        note.rourl = readOnly + note.roID
+        # note.roID = pad.getReadOnlyID(note.padID)['readOnlyID']
+        # print 'setpublic ',pad.setPublicStatus(note.padID, 'true')
+        # print 'getpublic ',pad.getPublicStatus(note.padID)
+        # note.rourl = readOnly + note.roID
+        note.dump = pad.getHtml(note.padID)['html']
         for m in note.users.all():
             if m.public_access == False:
                 m.public_access = True
