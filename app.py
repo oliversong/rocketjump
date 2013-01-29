@@ -49,7 +49,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://hello:shoopdawoop@localhos
 pad = EtherpadLiteClient(apiKey,'http://pad.notability.org/api')
 DOMAIN = '.notability.org'
 padURL = 'http://pad.notability.org/p/'
-readOnly = 'http://pad.notability.org:9001/ro/'
+readOnly = 'http://pad.notability.org/ro/'
 
 app.config['DEBUG'] = DEBUG
 app.config['SECRET_KEY'] = SECRET_KEY
@@ -527,7 +527,6 @@ def prefupdate():
 @app.route('/home/')
 def home():
     if 'fid' not in session:
-        flash('Please sign in.')
         return redirect(url_for('index'))
     collabs=[]
     curnotes = g.user.notes
