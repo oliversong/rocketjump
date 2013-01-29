@@ -12,18 +12,18 @@ $('.startClass').click ()->
 		)
 
 $('.finishbtn').click ()->
-	id = $(this).attr('noteid')
-	course = $(this).attr('coursename')
-	$.post('/'+course+'/'+id+'/done',(d,st,xr)->
-		$.noop()
+	coursename = $(this).attr('coursename')
+	nid = $(this).attr('noteid')
+	herp = $(this)
+	$.post('/'+coursename+'/'+nid+'/done',(d,st,xr)->
+		herp.parent().remove()
 		)
 
 window.inplace = (content)->
-	path = window.location.pathname
-	$.post(path+'/new',{newval:content},(d,st,xr)->
-		$.noop()
-		)
-
+    path = window.location.pathname
+    $.post(path+'/new',{newval:content},(d,st,xr)->
+        $.noop()
+        )
 
 if window.location.pathname=="/"
 	$('footer').css('border','none')

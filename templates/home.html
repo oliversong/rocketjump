@@ -44,7 +44,7 @@ Home
 		{% if unclosed %}
 			{% for unclosednote in unclosed %}
 			    <div class="alert alert-info">
-			    	<button type="button" class="close" data-dismiss="alert">&times;</button>Hey, are you done with this? <a href="{{ url_for('notepad', coursename=unclosednote.course.name, noteid=unclosednote.id) }}" target="_self">{{ unclosednote.name }}</a> <button class='finishbtn' noteid='{{ unclosednote.id }}' coursename='{{ unclosednote.course.name }}'>Yep</button>
+			    	<button type="button" class="close" data-dismiss="alert">&times;</button>Hey, are you done with this? <a href="{{ url_for('notepad', coursename=unclosednote.course.name, noteid=unclosednote.id) }}" target="_self">{{ unclosednote.name }}</a> <button class='finishbtn btn' coursename='{{ unclosednote.course.name }}' noteid='{{ unclosednote.id }}'>Yep</button>
 			    </div>
 			{% endfor %}
 		{% else %}

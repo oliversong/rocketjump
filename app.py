@@ -710,7 +710,10 @@ def notepad(coursename, noteid):
 @app.route('/<coursename>/<int:noteid>/done', methods=['GET','POST'])
 def done(coursename, noteid):
     note = db.session.query(Note).filter(Note.id == noteid).first()
+    print note
+    print note.users.all()
     if note not in g.user.notes:
+        print "note not in user's notes"
         abort(401)
     note.liveCount -= 1
     if note.liveCount == 0:

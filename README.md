@@ -5,10 +5,7 @@ Ruby is too confusing.
 ==============
 
 ### TODO
-* Reroll your partner?
-* Initial "Are you in this course?"
-* Close this note correctly
-* Don't make duplicate notes or route to other people's notes
+* Test/debug reroll
 * Fix node.js styling
 * Analytics
 	* How many people are queued
@@ -16,6 +13,7 @@ Ruby is too confusing.
 	* Length of notes that people are taking
 	* Typing speed of notes that people are taking
 * Professor dashboard
+* disable then reenable domain forwarding godaddy fuck you
 
 
 ### Done
@@ -34,3 +32,7 @@ Ruby is too confusing.
 13. Caching thing dafuq
 14. Settings (gender prefs)
 15. Matchmaker algorithm (gender)
+16. Initial "Are you in this course?"
+17. Reroll your partner?
+18. Don't make duplicate notes or route to other people's notes
+19. Close this note correctly

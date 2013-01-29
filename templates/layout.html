@@ -28,6 +28,7 @@
     <body>
         <script src="http://code.jquery.com/jquery-latest.js"></script>
         <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+        
         {% include "header.html" %}
 
         {% block body %}{% endblock %}
@@ -35,6 +36,8 @@
         {% include "footer.html" %}
 
         <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/jedit.js') }}"></script>
+        <script>$('body').editables({ onFreeze:'inplace' });</script>
 
         <script type="text/javascript">
 
