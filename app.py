@@ -38,6 +38,7 @@ FACEBOOK_APP_SECRET = 'd5be13df741b358d10a26aceeeff5dd0'
 DOMAIN = '.testability.org'
 pad = EtherpadLiteClient(apiKey,'http://0.0.0.0:9001/api')
 padURL = 'http://pad.testability.org:9001/p/'
+readOnly = 'http://pad.testability.org:9001/ro/'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/rocketjumpdb'
 
 # EC2
@@ -137,6 +138,7 @@ class User(db.Model):
     gender = db.Column(db.String(80))
     interested_in = db.Column(db.String(80))
     just_created = db.Column(db.Boolean, default=True)
+    public_access = db.Column(db.Boolean, default=False)
     intent = db.Column(db.String(80))
     picurl = db.Column(db.String(120))
     spicurl = db.Column(db.String(120))
@@ -210,6 +212,8 @@ class Note(db.Model):
     lecture_id = db.Column(db.Integer, db.ForeignKey('lectures.id'))
     public = db.Column(db.Boolean, default=False)
     url = db.Column(db.String(300))
+    padID = db.Column(db.String(120))
+    rourl = db.Column(db.String(300))
     inProgress = db.Column(db.Boolean, default=False)
     liveCount = db.Column(db.Integer)
     sessionID = db.relationship('SessionID', backref='note', lazy='dynamic')
@@ -364,6 +368,7 @@ def createPad(user,course,lecture):
     db.session.add(newNote)
     db.session.commit()
     pad.createGroupPad(newNote.lecture.groupID, newNote.id)
+    newNote.padID = lecture.groupID + "$" + str(newNote.id)
     newNote.url = padURL + lecture.groupID + "$" + str(newNote.id)
     db.session.commit()
 
@@ -610,10 +615,11 @@ def course(coursename):
                 live = True
         noPublic=True
         for y in courseobj[0].notes:
+            print y.public
             if y.public:
-                noPublic==False
+                noPublic=False
 
-    return render_template('course.html', course=courseobj[0], enrolled=enrolled, unclosed=unclosed, unotes=unotes, live=live, noPublic=noPublic)
+    return render_template('course.html', course=courseobj[0], enrolled=enrolled, unclosed=unclosed, unotes=reversed(unotes), live=live, noPublic=noPublic)
 
 @app.route('/<coursename>/match')
 def match(coursename):
@@ -696,33 +702,62 @@ def notepad(coursename, noteid):
         abort(401)
     user = db.session.query(User).filter(User.fid == session['fid']).first()
     note = db.session.query(Note).filter(Note.id == noteid).first()
-    sid = db.session.query(SessionID).filter(SessionID.user == user).filter(SessionID.note == note).first().sessionID
-    note.inProgress = True
-    note.lecture.live = True
-    db.session.commit()
-    if note not in user.notes:
-        flash("Sorry, you're not part of that note!")
-        redirect(url_for('home'))
-    response = make_response(render_template('notepad.html',note=note))
-    response.set_cookie('sessionID', sid, domain=DOMAIN)
-    return response
+    if 'public' in request.args:
+        print "public detected"
+        if request.args['public']:
+            print "read only mode"
+            return render_template('notepad.html', note=note, public=True)
+    else:
+        sid = db.session.query(SessionID).filter(SessionID.user == user).filter(SessionID.note == note).first().sessionID
+        note.inProgress = True
+        note.lecture.live = True
+        db.session.commit()
+        if note not in user.notes:
+            flash("Sorry, you're not part of that note!")
+            redirect(url_for('home'))
+        response = make_response(render_template('notepad.html',note=note, public=False))
+        response.set_cookie('sessionID', sid, domain=DOMAIN)
+        return response
 
 @app.route('/<coursename>/<int:noteid>/done', methods=['GET','POST'])
 def done(coursename, noteid):
     note = db.session.query(Note).filter(Note.id == noteid).first()
+    public = request.args.getlist('public')
+    print 'public',public
     print note
     print note.users.all()
     if note not in g.user.notes:
         print "note not in user's notes"
         abort(401)
+    print note.liveCount
     note.liveCount -= 1
-    if note.liveCount == 0:
+    if note.liveCount <= 0:
+        print "note turned off"
         note.inProgress = False
     result = False
     for blah in note.lecture.notes:
         if blah.inProgress:
             result = True
     note.lecture.live = result
+    if public:
+        note.public = True
+        note.roID = pad.getReadOnlyID(note.padID)['readOnlyID']
+        print 'setpublic ',pad.setPublicStatus(note.padID, 'true')
+        print 'getpublic ',pad.getPublicStatus(note.padID)
+        note.rourl = readOnly + note.roID
+        for m in note.users.all():
+            if m.public_access == False:
+                m.public_access = True
+    else:
+        note.public = False
+        for m in note.users.all():
+            m.public_access = False
+            for n in m.notes:
+                if n.public:
+                    m.public_access = True
+                    return
+
+    # later add in user publicked here
     db.session.commit()
     if request.method == 'GET':
         return redirect(url_for('home'))

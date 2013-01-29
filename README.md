@@ -6,6 +6,7 @@ Ruby is too confusing.
 
 ### TODO
 * Test/debug reroll
+* Test meet someone special side
 * Fix node.js styling
 * Analytics
 	* How many people are queued
@@ -13,7 +14,6 @@ Ruby is too confusing.
 	* Length of notes that people are taking
 	* Typing speed of notes that people are taking
 * Professor dashboard
-* disable then reenable domain forwarding godaddy fuck you
 
 
 ### Done
@@ -36,3 +36,6 @@ Ruby is too confusing.
 17. Reroll your partner?
 18. Don't make duplicate notes or route to other people's notes
 19. Close this note correctly
+20. Public mode + read only
+21. disable then reenable domain forwarding godaddy fuck you
+22. Restrict + unlock public notes

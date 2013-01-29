@@ -110,26 +110,31 @@ Course
 				<div class="row pushdown2">
 					<div class="span6">
 						<div class="courseheader2">Public Notes</div>
-						{% for note in course.notes %}
-							{% if note.public %}
-								<a href="{{ url_for('notepad', coursename=course.name, noteid=note.id) }}" target="_self">
-									<div class="coursetab">
-										{{ note.date }} - {{ note.name }}<br />
-										By 
-										{% if note.users.all()|count == 2 %}
-											{{ note.users.all()[0].fname }} {{ note.users.all()[0].lname }}
-											and {{ note.users.all()[1].fname }} {{ note.users.all()[1].lname }}
-										{% else %}
-											{{ note.users.all()[0].fname }} {{ note.users.all()[0].lname }}
-										{% endif %}
-										<!-- TODO: word count -->
-									</div>
-								</a>
+						{% if g.user.public_access %}
+							{% for note in course.notes[::-1] %}
+								{% if note.public %}
+									<a href="{{ url_for('notepad', coursename=course.name, noteid=note.id, public=True) }}" target="_self">
+										<div class="coursetab">
+											{{ note.date }} - {{ note.name }}<br />
+											By 
+											{% if note.users.all()|count == 2 %}
+												{{ note.users.all()[0].fname }} {{ note.users.all()[0].lname }}
+												and {{ note.users.all()[1].fname }} {{ note.users.all()[1].lname }}
+											{% else %}
+												{{ note.users.all()[0].fname }} {{ note.users.all()[0].lname }}
+											{% endif %}
+											<!-- TODO: word count -->
+										</div>
+									</a>
+								{% endif %}
+							{% endfor %}
+							{% if noPublic %}
+								<h3>No public notes yet!</h3>
 							{% endif %}
-						{% endfor %}
-						{% if noPublic %}
-							<h3>No public notes yet!</h3>
+						{% else %}
+							<h3>You must publish a note before you can view others' notes!</h3>
 						{% endif %}
+
 					</div>
 				</div>
 			</div>

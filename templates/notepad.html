@@ -11,29 +11,41 @@ Pad
 			<div class="span8">
 				<h3>{{ note.course.name }} - {{ note.lecture.date }} - 
 					<span class="noteName" coursename="{{ note.course.name }}" noteid="{{ note.id }}">
+						{% if not public %}
 						<text data-type="editable" data-for=".awwyee">{{ "'"+note.name+"'" }}</text><input class="awwyee" />
+						{% else %}
+						{{ "'"+note.name+"'" }}
+						{% endif %}
 					</span>
 				</h3>
 			</div>
+			{% if not public %}
 			<div class="span4">
 				<form action="{{ url_for('reroll', coursename=note.course.name, noteid=note.id) }}" method=get>
 					<button class="btn btn-info pull-right" type=submit style="margin-top:10px"><i class="icon-refresh icon-white"></i> Reroll</button>
 				</form>
 			</div>
+			{% endif %}
 		</div>
 		<div class="row">
 			<div class="span12">
-				<iframe seamless='seamless' class='notepad' src="{{ note.url }}"></iframe>
+				<iframe seamless='seamless' class='notepad' src="{% if not public %}{{ note.url }}{% else %}{{ note.rourl }}{% endif %}"></iframe>
 			</div>
 		</div>
 
+		{% if not public %}
 		<div class="row">
 			<div class="span12">
+
 				<form action="{{ url_for('done', coursename=note.course.name, noteid=note.id) }}" method=get>
 					<button class="btn btn-info pull-right" type=submit style="margin-top:10px; margin-bottom:30px"><i class="icon-check icon-white"></i> Mark as Finished</button>
+					<label class='checkbox inline pull-right publicbox'>
+						<input type="checkbox" name="public" value="yes" {% if note.public %} checked {% endif %}>Public
+					</label>
 				</form>
 			</div>
 		</div>
+		{% endif %}
 	</div>
 </div>
 
