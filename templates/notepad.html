@@ -8,7 +8,7 @@ Pad
 <div class="padcontain">
 <div class="container">
 		<div class="row">
-			<div class="span8">
+			<div class="{% if not public %}span10{% else %}span12{% endif %}">
 				<h2>{{ note.course.name }} - {{ note.lecture.date }} - 
 					<span class="noteName" coursename="{{ note.course.name }}" noteid="{{ note.id }}">
 						{% if not public %}
@@ -20,7 +20,7 @@ Pad
 				</h2>
 			</div>
 			{% if not public %}
-			<div class="span4">
+			<div class="span2">
 				<form action="{{ url_for('reroll', coursename=note.course.name, noteid=note.id) }}" method=get>
 					<button class="btn btn-info pull-right" type=submit style="margin-top:10px"><i class="icon-refresh icon-white"></i> Reroll</button>
 				</form>

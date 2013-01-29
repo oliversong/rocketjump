@@ -7,7 +7,6 @@ Ruby is too confusing.
 ### TODO
 * Test/debug reroll
 * Test meet someone special side
-* Make final graphics and put them in
 * Analytics
 	* How many people are queued
 	* How many people are taking notes
@@ -42,3 +41,4 @@ Ruby is too confusing.
 23. Fix node.js styling
 24. Sexy read only mode doesn't work on old version of server
 25. Remove macbook air logo
+26. Make final graphics and put them in

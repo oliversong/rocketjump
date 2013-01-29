@@ -341,7 +341,7 @@ def matchmake(lecture):
                     db.session.commit()
                     return matched
         else:
-            print "Detecting dude lookingt to get laid."
+            print "Detecting dude looking to get laid."
             for i,u in enumerate(users):
                 if genderpref is "either" or "":
                     if u.interested_in == g.user.gender:
@@ -364,9 +364,9 @@ def createPad(user,course,lecture):
         print "putting ",user,"on the queue"
         queue.append(user)
     now = datetime.now()
-    dt = now.strftime("%Y-%m-%d-%H-%M")
+    pretty = now.strftime('%A %B %d, %Y at %I:%M%p')
     # make new etherpad for user to wait in
-    newNote = Note(dt, lecture, course, [user]) # init also creates a new pad at /p/groupID$noteID
+    newNote = Note(pretty, lecture, course, [user]) # init also creates a new pad at /p/groupID$noteID
     db.session.add(newNote)
     db.session.commit()
     pad.createGroupPad(newNote.lecture.groupID, newNote.id)
@@ -379,8 +379,9 @@ def createPad(user,course,lecture):
 def createLecture(user, course):
     # create new lecture
     now = datetime.now()
-    dt = now.strftime("%Y-%m-%d-%H-%M")
-    newLecture = Lecture(dt, course)
+    pretty = now.strftime('%A %B %d, %Y at %I:%M%p')
+
+    newLecture = Lecture(pretty, course)
     db.session.add(newLecture)
 
     # add lecture to course, add new queue to lecture, add user to queue, add new user to lecture
@@ -390,7 +391,7 @@ def createLecture(user, course):
 
     newLecture.users.append(user)
     newQueue.users.append(user)
-    newLecture.groupID = pad.createGroupIfNotExistsFor(newLecture.course.name+dt)['groupID']
+    newLecture.groupID = pad.createGroupIfNotExistsFor(newLecture.course.name+pretty)['groupID']
 
     db.session.commit()
     return newLecture
@@ -776,6 +777,7 @@ def reroll(coursename, noteid):
     otheruser = [u for u in note.users.all() if u != g.user][0]
     sid = db.session.query(SessionID).filter(SessionID.user == g.user).filter(SessionID.note == note).first()
     note.users.remove(g.user)
+    note.liveCount -= 1
     pad.deleteSession(sid.sessionID)
     db.session.delete(sid)
 
