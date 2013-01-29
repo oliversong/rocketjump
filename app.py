@@ -56,20 +56,8 @@ app.config['SECRET_KEY'] = SECRET_KEY
 oauth = OAuth()
 db = SQLAlchemy(app)
 
-def initdb():
-    db.drop_all()
-    db.create_all()
-    new1 = Course('6.470 - Web Programming Competition', 'Cool people', "MIT 6.470 is a web programming class and competition that takes place over the IAP period at MIT. We are student-run with generous support from professors, administrators, and external sponsors. This is our 5th year running the competition. We've made huge strides from the first time that 6.470 was run and look to make it even bigger and better this year.")
-    new2 = Course('6.270 - Autonomous Robot Competition', 'Consult Department', "6.270 is a hands-on, learn-by-doing class open only to MIT students, in which participants design and build a robot that will play in a competition at the end of January. The goal is to design a machine that will be able to navigate its way around the playing surface, recognize other opponents, and manipulate game objects. Unlike the machines in Introduction to Design (formerly 2.70, now 2.007), 6.270 robots are totally autonomous, so once a round begins, there is no human intervention (in 2.007 the machines are controlled with joysticks).")
-    new3 = Course('6.370 - Battlecode', 'Consult Department', "The 6.370 Battlecode programming competition is a unique challenge that combines battle strategy, software engineering and artificial intelligence. In short, the objective is to write the best player program for the computer game Battlecode.")
-    new4 = Course('6.570 - Mobile App Competition', 'Consult Department', "6.570 is MIT's annual IAP Mobile Development Competition. Teams of 2-3 students will have 4 weeks to design and build an Android application. This year, it will run from January 7th - January 31st, 2013. The first two weeks of the competition will consist of lectures given both by students and leading industry experts, covering the basics of Android development, as well as other relevant concepts and tools, to help the participants build great apps. The contest will culminate in a public presentation by all teams in front of a judging panel comprised of MIT faculty and professional developers. Great prizes and everlasting fame will be awarded to the champions of 6.570!")
-    new5 = Course('6.670 - iOS Game Competition', 'Consult Department', "Learn how to make iOS games, build an awesome game, and win cash prizes from sponsors like Playfirst, 500Startups, and Andreessen Horowitz!")
-    db.session.add(new1)
-    db.session.add(new2)
-    db.session.add(new3)
-    db.session.add(new4)
-    db.session.add(new5)
-    jsonData = open('dataset/IAPcourses.json')
+def loadData(file):
+    jsonData = open(file)
     data = json.load(jsonData)
     jsonData.close()
     for item in data['items']:
@@ -85,6 +73,23 @@ def initdb():
             description = item["description"]
             new = Course(course_name, professor, description)
             db.session.add(new)
+    db.session.commit()
+
+def initdb():
+    db.drop_all()
+    db.create_all()
+    new1 = Course('6.470 - Web Programming Competition', 'Cool people', "MIT 6.470 is a web programming class and competition that takes place over the IAP period at MIT. We are student-run with generous support from professors, administrators, and external sponsors. This is our 5th year running the competition. We've made huge strides from the first time that 6.470 was run and look to make it even bigger and better this year.")
+    new2 = Course('6.270 - Autonomous Robot Competition', 'Consult Department', "6.270 is a hands-on, learn-by-doing class open only to MIT students, in which participants design and build a robot that will play in a competition at the end of January. The goal is to design a machine that will be able to navigate its way around the playing surface, recognize other opponents, and manipulate game objects. Unlike the machines in Introduction to Design (formerly 2.70, now 2.007), 6.270 robots are totally autonomous, so once a round begins, there is no human intervention (in 2.007 the machines are controlled with joysticks).")
+    new3 = Course('6.370 - Battlecode', 'Consult Department', "The 6.370 Battlecode programming competition is a unique challenge that combines battle strategy, software engineering and artificial intelligence. In short, the objective is to write the best player program for the computer game Battlecode.")
+    new4 = Course('6.570 - Mobile App Competition', 'Consult Department', "6.570 is MIT's annual IAP Mobile Development Competition. Teams of 2-3 students will have 4 weeks to design and build an Android application. This year, it will run from January 7th - January 31st, 2013. The first two weeks of the competition will consist of lectures given both by students and leading industry experts, covering the basics of Android development, as well as other relevant concepts and tools, to help the participants build great apps. The contest will culminate in a public presentation by all teams in front of a judging panel comprised of MIT faculty and professional developers. Great prizes and everlasting fame will be awarded to the champions of 6.570!")
+    new5 = Course('6.670 - iOS Game Competition', 'Consult Department', "Learn how to make iOS games, build an awesome game, and win cash prizes from sponsors like Playfirst, 500Startups, and Andreessen Horowitz!")
+    db.session.add(new1)
+    db.session.add(new2)
+    db.session.add(new3)
+    db.session.add(new4)
+    db.session.add(new5)
+    loadData('dataset/IAPcourses.json')
+    loadData('dataset/spring13courses.json')
     db.session.commit()
 
 facebook = oauth.remote_app('facebook',
