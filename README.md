@@ -7,7 +7,6 @@ Ruby is too confusing.
 ### TODO
 * Test/debug reroll
 * Test meet someone special side
-* Remove macbook air logo
 * Make final graphics and put them in
 * Analytics
 	* How many people are queued
@@ -41,3 +40,5 @@ Ruby is too confusing.
 21. disable then reenable domain forwarding godaddy fuck you
 22. Restrict + unlock public notes
 23. Fix node.js styling
+24. Sexy read only mode doesn't work on old version of server
+25. Remove macbook air logo

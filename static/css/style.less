@@ -145,6 +145,8 @@ footer a:hover{
     width:100%;
     height:auto;
     text-align:right;
+    z-index:9;
+    position:relative;
 }
 .wellwhat{
     padding-top:80px;
@@ -514,13 +516,19 @@ footer a:hover{
     height:4.5px;
     width:100%;
     background-color:#ff9a09;
+    position:relative;
+    z-index:25;
 }
 .collabcontain, .uppercontain, .coursecontain, .padcontain{
     width:100%;
     height:auto;
+    position:relative;
 }
 .padcontain{
     height:90%;
+}
+.collabcontain{
+    box-shadow:0 0px 3px #000
 }
 .coursecontain{
     padding-top:5px;
@@ -534,19 +542,19 @@ footer a:hover{
     display:none;
 }
 .collab, .matching{
-    margin-top:100px;
-    margin-bottom:100px;
+    margin-top:30px;
+    margin-bottom:50px;
 }
 .collabimg{
-    .at2x('../img/macbookair.png',575px,305px);
-    height:305px;
+    .at2x('../img/macbookair.png',750px,500px);
+    height:400px;
     background-repeat:no-repeat;
     background-position:center center;
-    background-size:contain;
+    background-size:contain !important;
 }
 .collablabel, .matchinglabel{
     vertical-align: middle;
-    margin-top:60px;
+    margin-top:110px;
 }
 .matchcontain{
     background-color:#ede9de;
@@ -554,11 +562,36 @@ footer a:hover{
     height:auto;
 }
 .matchingimg{
-    background-color:@orange;
-    height:305px;
+    .at2x('../img/cloud.png',500px,349px);
+    height:349px;
+    background-repeat:no-repeat;
+    background-position:center center;
+    background-size:contain !important;
+    background-color:transparent;
+    text-align:center;
+}
+.biggear{
+    .at2x('../img/biggear.png',180px,180px);
+    height:180px;
+    width:180px;
+    margin-top:90px;
+    background-repeat:no-repeat;
+    background-position:center center;
+    background-size:contain !important;
+    background-color:transparent;
+}
+.smallgear{
+    .at2x('../img/smallgear.png',100px,100px);
+    height:100px;
+    width:100px;
+    background-repeat:no-repeat;
+    background-color:transparent;
+    background-position:center center;
+    background-size:contain !important;
 }
 .midtext{
     font-size:16px;
+    line-height:25px;
 }
 .analytics{
     padding-top:50px;
@@ -568,18 +601,22 @@ footer a:hover{
     background-color:#e4e1d6;
     height:auto;
     width:100%;
+    border-top:1px solid #cdcdcd;
 }
 .analyticsimg{
     .at2x('../img/macbookpro.png',1016px,356px);
-    height:356px;
-    background-repeat:no-repeat;
-    background-position:center bottom;
-    background-size:contain;
+    height: 356px;
+    background-repeat: no-repeat;
+    background-position: center bottom;
+    background-size: contain !important;
 }
 .howitcontain{
     background-color:#eae5d5;
     width:100%;
     height:auto;
+    box-shadow: 0 0px 3px #000;
+    z-index:10;
+    position:relative;
 }
 .howit{
     text-align:center;
@@ -588,6 +625,40 @@ footer a:hover{
 }
 .imgstep1, .imgstep2, .imgstep3, .imgstep4{
     height:150px;
-    background-color:@orange;
     margin-bottom:15px;
+    height:170px !important;
+    width:170px !important;
+    position:relative;
+    left:50%;
+    margin-left:-65px;
+}
+@media (max-width: 767px){
+    .imgstep1, .imgstep2, .imgstep3, .imgstep4{
+        margin-left:-85px;
+
+    }
+}
+.imgstep1{
+    .at2x('../img/takenotes.png',170px,170px);
+    background-repeat:no-repeat;
+    background-position:center center;
+    background-size:contain !important;
+}
+.imgstep2{
+    .at2x('../img/dice.png',250px,250px);
+    background-repeat:no-repeat;
+    background-position:center center;
+    background-size:contain !important;
+}
+.imgstep3{
+    .at2x('../img/handnotes.png',251px,160px);
+    background-repeat:no-repeat;
+    background-position:center center;
+    background-size:contain !important;
+}
+.imgstep4{
+    .at2x('../img/friends.png',170px,170px);
+    background-repeat:no-repeat;
+    background-position:center center;
+    background-size:contain !important;
 }
