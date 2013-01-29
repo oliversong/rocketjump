@@ -17,9 +17,6 @@ parse = (str, separator) ->
 	setTimeout (->
 	    $.post(pathname+'/polll',(d,st,xr)->
 	        console.log(d)
-	        d = d.replace(/\'/g, '');
-	        shit = $.parseJSON(d)
-	        console.log shit
 
 	        # take off the first div
 	        #$('.dudegraph div').remove()
@@ -28,9 +25,7 @@ parse = (str, separator) ->
 	        # Get the current max value
 
 	        # Add in new value and scale heights
-	        f = shit['taking']+shit['queuelength']
-	        console.log(f)
-	        $('.duderow').append('<div class="span1 datapoint" style="height:'+f*0.05*300+'px></div>')
+	        $('.duderow').append('<div class="span1 datapoint" style="height:'+parseInt(d)*0.05*300+'px"></div>')
 	        
 	        #Setup the next poll recursively
 	        poll()

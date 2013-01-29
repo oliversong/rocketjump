@@ -731,8 +731,8 @@ def polll(lectureid):
             taking+=1
     print 'calc'
     shit = {'live': lecture.live, 'queuelength': len(lecture.queue.users.all()), 'taking': taking}
-    print shit
-    return str(shit)
+    blah = shit['queuelength']+shit['taking']
+    return str(blah)
 
 
 @app.route('/<coursename>/<int:noteid>')
