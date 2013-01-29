@@ -9,7 +9,7 @@ Pad
 <div class="container">
 		<div class="row">
 			<div class="span8">
-				<h3>{{ note.course.name }} - {{ note.lecture.date }} - 
+				<h2>{{ note.course.name }} - {{ note.lecture.date }} - 
 					<span class="noteName" coursename="{{ note.course.name }}" noteid="{{ note.id }}">
 						{% if not public %}
 						<text data-type="editable" data-for=".awwyee">{{ "'"+note.name+"'" }}</text><input class="awwyee" />
@@ -17,7 +17,7 @@ Pad
 						{{ "'"+note.name+"'" }}
 						{% endif %}
 					</span>
-				</h3>
+				</h2>
 			</div>
 			{% if not public %}
 			<div class="span4">

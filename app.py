@@ -755,7 +755,6 @@ def done(coursename, noteid):
             for n in m.notes:
                 if n.public:
                     m.public_access = True
-                    return
 
     # later add in user publicked here
     db.session.commit()

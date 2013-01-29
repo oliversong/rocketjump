@@ -75,7 +75,7 @@ Home
 							</div>
 						</a>
 					{% else %}
-						<h3>No courses yet. Won't you join one?</h3>
+						<h3>No courses yet - won't you join one?</h3>
 					{% endfor %}
 			</div>
 			<div class="span6">
@@ -102,7 +102,7 @@ Home
 							{% for note in g.user.notes %}
 								<li><a href="{{ url_for('notepad', coursename=note.course.name, noteid=note.id) }}" target="_self">{{ note.course.name }} - {{ note.date }} - {{ note.name }}</a></li>
 							{% else %}
-								<h3>No notes so far!</h3>
+								<h3>No notes so far</h3>
 							{% endfor %}
 						</ul>
 					</div>
