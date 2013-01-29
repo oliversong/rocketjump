@@ -32,23 +32,24 @@ app = Flask(__name__)
 app.wsgi_app = ProxyFix(app.wsgi_app)
 
 # local configs
-apiKey = "qSoNop1JjHxPQcJkv3L5rrmgBrqNgC1t"
-FACEBOOK_APP_ID = '136661329828261'
-FACEBOOK_APP_SECRET = 'd5be13df741b358d10a26aceeeff5dd0'
-DOMAIN = '.testability.org'
-pad = EtherpadLiteClient(apiKey,'http://0.0.0.0:9001/api')
-padURL = 'http://pad.testability.org:9001/p/'
-readOnly = 'http://pad.testability.org:9001/ro/'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/rocketjumpdb'
+#apiKey = "qSoNop1JjHxPQcJkv3L5rrmgBrqNgC1t"
+#FACEBOOK_APP_ID = '136661329828261'
+#FACEBOOK_APP_SECRET = 'd5be13df741b358d10a26aceeeff5dd0'
+#DOMAIN = '.testability.org'
+#pad = EtherpadLiteClient(apiKey,'http://0.0.0.0:9001/api')
+#padURL = 'http://pad.testability.org:9001/p/'
+#readOnly = 'http://pad.testability.org:9001/ro/'
+#app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/rocketjumpdb'
 
 # EC2
-# apiKey = "shoopdawoop"
-# FACEBOOK_APP_ID = '124499577716801'
-# FACEBOOK_APP_SECRET = '8f3dc21d612f5ef19dbc98221e1c7a0d'
-# app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://hello:shoopdawoop@localhost/rocketjumpdb'
-# pad = EtherpadLiteClient(apiKey,'http://pad.notability.org/api')
-# DOMAIN = '.notability.org'
-# padURL = 'http://pad.notability.org/p/'
+apiKey = "shoopdawoop"
+FACEBOOK_APP_ID = '124499577716801'
+FACEBOOK_APP_SECRET = '8f3dc21d612f5ef19dbc98221e1c7a0d'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://hello:shoopdawoop@localhost/rocketjumpdb'
+pad = EtherpadLiteClient(apiKey,'http://pad.notability.org/api')
+DOMAIN = '.notability.org'
+padURL = 'http://pad.notability.org/p/'
+readOnly = 'http://pad.notability.org:9001/ro/'
 
 app.config['DEBUG'] = DEBUG
 app.config['SECRET_KEY'] = SECRET_KEY
