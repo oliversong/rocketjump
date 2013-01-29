@@ -472,7 +472,14 @@ def facebook_authorized(resp):
                 interested = "male"
             elif "female" in interested:
                 interested = "female"
+            else:
+                print "strange behavior: unrecognized interested_in specified"
+                if gender=='male':
+                    interested='female'
+                else:
+                    interested='male'
         else:
+            print "interested_in not specified, assuming hetero"
             if gender=='male':
                 interested='female'
             else:
@@ -513,7 +520,7 @@ def prefupdate():
     intent = request.args['intent']
     gender = request.args['gender']
     interested_in = request.args.getlist('interested')
-    print interested_in
+    print intent, gender, interested_in
     g.user.intent = intent
     g.user.gender = gender
     if len(interested_in)==2:
@@ -697,6 +704,16 @@ def match(coursename):
     else:
         # dafuq
         abort(401)
+
+@app.route('/lecture/<int:lectureid>')
+def panel(lectureid):
+    lecture = db.session.query(Lecture).filter(Lecture.id == lectureid).first()
+    # LIVE status
+    lecture.live
+    # Queue length
+    len(lecture.queue)
+    # Number in notes
+    lecture.queue
 
 @app.route('/<coursename>/<int:noteid>')
 def notepad(coursename, noteid):

@@ -50,10 +50,10 @@ Settings
 				<br /><br /><br />
 				<legend>Looking for</legend>
 				<label class="checkbox inline">
-					<input type="checkbox" name='interested' value='male' {% if g.user.interested_in=='male' or 'either' %} checked {% endif %}>Male
+					<input type="checkbox" name='interested' value='male' {% if g.user.interested_in=='male' or g.user.interested_in=='either' %} checked {% endif %}>Male
 				</label>
 				<label class="checkbox inline">
-					<input type="checkbox" name='interested' value='female' {% if g.user.interested_in=='female' or 'either' %} checked {% endif %}>Female
+					<input type="checkbox" name='interested' value='female' {% if g.user.interested_in=='female' or g.user.interested_in=='either' %} checked {% endif %}>Female
 				</label>
 				<br /><br />
 				<br /><br />

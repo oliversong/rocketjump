@@ -5,7 +5,6 @@ Ruby is too confusing.
 ==============
 
 ### TODO
-* Test/debug reroll
 * Test meet someone special side
 * Analytics
 	* How many people are queued
@@ -42,3 +41,4 @@ Ruby is too confusing.
 24. Sexy read only mode doesn't work on old version of server
 25. Remove macbook air logo
 26. Make final graphics and put them in
+27. Test/debug reroll
