@@ -56,7 +56,6 @@ Course
 					<div class="span6">
 						<div class="courseheader2">Class Info</div>
 						Professor: {{ course.professor }}<br />
-						Location: {{ course.location }}<br />
 						Enrollment: {{ course.users.all()|count }}<br />
 						{% if course.lectures.all() %}
 						Most recent lecture: {{ course.lectures.all()[-1].date }}<br />

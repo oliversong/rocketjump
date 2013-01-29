@@ -145,7 +145,7 @@ class User(db.Model):
     notes = db.relationship('Note', secondary=noteTable, backref=db.backref('users', lazy='dynamic'))
     queues = db.relationship('Queue', secondary=queueTable, backref=db.backref('users', lazy='dynamic'))
     authorID = db.Column(db.String(120), unique=True)
-    sessionID = db.Column(db.String(120))
+    sessionID = db.relationship('SessionID', backref='user', lazy='dynamic')
     college = db.Column(db.String(120))
 
     def __init__(self, fid, fname, lname, gender, interested, email, username, college):
@@ -212,6 +212,7 @@ class Note(db.Model):
     url = db.Column(db.String(300))
     inProgress = db.Column(db.Boolean, default=False)
     liveCount = db.Column(db.Integer)
+    sessionID = db.relationship('SessionID', backref='note', lazy='dynamic')
 
     def __init__(self, date, lecture, course, users):
         self.date = date
@@ -236,6 +237,21 @@ class Queue(db.Model):
 
     def __repr__(self):
         return '<Queue %r>' % self.id
+
+class SessionID(db.Model):
+    __tablename__ = 'sessionids'
+    id = db.Column(db.Integer, primary_key=True)
+    sessionID = db.Column(db.String(200))
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    note_id = db.Column(db.Integer, db.ForeignKey('notes.id'))
+
+    def __init__(self, sessionid, user, note):
+        self.sessionID = sessionid
+        self.note = note
+        self.user = user
+
+    def __repr__(self):
+        return self.sessionID
 
 class Asset(db.Model):
     __tablename__ = 'assets'
@@ -302,16 +318,44 @@ class ItsdangerousSessionInterface(SessionInterface):
 def matchmake(lecture):
 
     # SHIIIEEET BLACK BOX ALGORITHM BRO
-    if len(lecture.queue.users.all()) != 0:
-        matched = lecture.queue.users.all().pop(0)
-        db.session.commit()
-        return matched 
+    # include genders and gender preferences
+    # look in to queue, find user that matches current user's preference
+    genderpref = g.user.interested_in
+    intent = g.user.intent
+    print "matching for user:",g.user,"with genderpref/intent",genderpref,"/",intent
+    users = lecture.queue.users.all()
+    print 'current queue', users
+    if len(users) != 0:
+        if intent=='meetnew':
+            print "Detecting cool dude who wants to meet new people."
+            for i,u in enumerate(users):
+                if u.interested_in == g.user.gender or u.intent=="meetnew":
+                    print "match!"
+                    matched = users.pop(i)
+                    db.session.commit()
+                    return matched
+        else:
+            print "Detecting dude lookingt to get laid."
+            for i,u in enumerate(users):
+                if genderpref is "either" or "":
+                    if u.interested_in == g.user.gender:
+                        matched = users.pop(i)
+                        db.session.commit()
+                        return matched
+                else:
+                    if u.gender == genderpref:
+                        if u.interested_in == g.user.gender:
+                            matched = users.pop(i)
+                            db.session.commit()
+                            return matched
     else:
         return None
+
 
 def createPad(user,course,lecture):
     queue = lecture.queue.users.all()
     if user not in queue:
+        print "putting ",user,"on the queue"
         queue.append(user)
     now = datetime.now()
     dt = now.strftime("%Y-%m-%d-%H-%M")
@@ -486,11 +530,12 @@ def home():
             if user != g.user:
                 if user not in collabs:
                     collabs.append(user)
-    possCourses= db.session.query(Course).order_by(desc(Course.count)).limit(3).all()
     suggested = []
-    for c in possCourses:
-        if g.user not in c.users:
-            suggested.append(c) 
+    if g.user.just_created:
+        possCourses= db.session.query(Course).order_by(desc(Course.count)).limit(1).all()
+        for c in possCourses:
+            if g.user not in c.users:
+                suggested.append(c) 
     # check for live notes
     unclosed=[]
     for x in g.user.notes:
@@ -511,7 +556,7 @@ def search():
     print "getting request"
     query = request.args['callback']
     print "this is the query:", query
-    result = db.session.query(Course).filter(Course.name.like('%'+query+'%')).limit(10).all()
+    result = db.session.query(Course).filter(Course.name.ilike('%'+query+'%')).limit(10).all()
     result = [x.name for x in result]
 
     print "result", result
@@ -578,7 +623,9 @@ def match(coursename):
     user = db.session.query(User).filter(User.fid == session['fid']).first()
     courseobj = db.session.query(Course).filter(Course.name == coursename).first()
     liveLectures = filter(lambda lecture: lecture.live == True, courseobj.lectures)
-    print "hi"
+    otheruser = None
+    if 'exclude' in request.args:
+        otheruser = db.session.query(User).filter(User.id==request.args['exclude']).first()
     if len(liveLectures) == 0:
         print "course isn't live"
 
@@ -592,8 +639,9 @@ def match(coursename):
         db.session.commit()
         newNote.liveCount += 1
 
-        sessionID = pad.createSession(newNote.lecture.groupID, user.authorID, int(time.time() + 86400))['sessionID']
-        user.sessionID = sessionID
+        sid = pad.createSession(newNote.lecture.groupID, user.authorID, int(time.time() + 86400))['sessionID']
+        newSession = SessionID(sid,user,newNote)
+        db.session.add(newSession)
         db.session.commit()
         return redirect(url_for('notepad', coursename=courseobj.name, noteid=newNote.id))
 
@@ -608,17 +656,19 @@ def match(coursename):
 
         # user isn't in a note
         matchedUser = matchmake(liveLectures[0])
-        if matchedUser != None:
+        if matchedUser != None and matchedUser != otheruser:
             # user waiting; pair up; remove other user from queue
             print 'user waiting'
             liveLectures[0].queue.users.remove(matchedUser)
+            liveLectures[0].users.append(user)
             note = matchedUser.notes[-1]
             user.notes.append(note)
             note.liveCount += 1
             db.session.commit()
             # everyone who is on the queue should already be in a pad, so just redirect the person to their note url
-            sessionID = pad.createSession(note.lecture.groupID, user.authorID, int(time.time()+86400))['sessionID']
-            user.sessionID = sessionID
+            sid = pad.createSession(note.lecture.groupID, user.authorID, int(time.time() + 86400))['sessionID']
+            newSession = SessionID(sid, user, note)
+            db.session.add(newSession)
             db.session.commit()
             return redirect(url_for('notepad', coursename=courseobj.name, noteid=note.id))
 
@@ -630,8 +680,9 @@ def match(coursename):
             newNote.inProgress = True
             newNote.liveCount += 1
             db.session.commit()
-            sessionID = pad.createSession(newNote.lecture.groupID, user.authorID, int(time.time()+86400))['sessionID']
-            user.sessionID = sessionID
+            liveLectures[0].users.append(user)
+            sid = pad.createSession(newNote.lecture.groupID, user.authorID, int(time.time()+86400))['sessionID']
+            newSession = SessionID(sid, user, newNote)
             db.session.commit()
             return redirect(url_for('notepad', coursename=courseobj.name, noteid=newNote.id))
 
@@ -645,6 +696,7 @@ def notepad(coursename, noteid):
         abort(401)
     user = db.session.query(User).filter(User.fid == session['fid']).first()
     note = db.session.query(Note).filter(Note.id == noteid).first()
+    sid = db.session.query(SessionID).filter(SessionID.user == user).filter(SessionID.note == note).first().sessionID
     note.inProgress = True
     note.lecture.live = True
     db.session.commit()
@@ -652,7 +704,7 @@ def notepad(coursename, noteid):
         flash("Sorry, you're not part of that note!")
         redirect(url_for('home'))
     response = make_response(render_template('notepad.html',note=note))
-    response.set_cookie('sessionID',user.sessionID, domain=DOMAIN)
+    response.set_cookie('sessionID', sid, domain=DOMAIN)
     return response
 
 @app.route('/<coursename>/<int:noteid>/done', methods=['GET','POST'])
@@ -673,6 +725,27 @@ def done(coursename, noteid):
         return redirect(url_for('home'))
     else:
         return 'done'
+
+@app.route('/<coursename>/<int:noteid>/reroll')
+def reroll(coursename, noteid):
+    note = db.session.query(Note).filter(Note.id == noteid).first()
+    lecture = note.lecture
+    #reroll not allowed if you're the only one in the note, duh
+    if len(note.users.all())==1:
+        return redirect(url_for('notepad', coursename=coursename, noteid=noteid))
+    # pull the user out of the note, revoke permissions
+    otheruser = [u for u in note.users.all() if u != g.user][0]
+    sid = db.session.query(SessionID).filter(SessionID.user == g.user).filter(SessionID.note == note).first()
+    note.users.remove(g.user)
+    pad.deleteSession(sid.sessionID)
+    db.session.delete(sid)
+
+    # put the other user back on the queue
+    lecture.queue.users.append(otheruser)
+
+    db.session.commit()
+    # put current user back through matching process and exclude other user from match
+    return redirect(url_for('match', coursename=coursename, exclude=otheruser.id))
 
 @app.route('/<coursename>/<int:noteid>/new', methods=['POST'])
 def updateName(coursename,noteid):

@@ -16,7 +16,9 @@ Pad
 				</h3>
 			</div>
 			<div class="span4">
-				<button class="btn btn-info pull-right" style="margin-top:10px"><i class="icon-refresh icon-white"></i> Reroll</button>
+				<form action="{{ url_for('reroll', coursename=note.course.name, noteid=note.id) }}" method=get>
+					<button class="btn btn-info pull-right" type=submit style="margin-top:10px"><i class="icon-refresh icon-white"></i> Reroll</button>
+				</form>
 			</div>
 		</div>
 		<div class="row">

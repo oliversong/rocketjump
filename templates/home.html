@@ -51,7 +51,7 @@ Home
 			{% if suggested %}
 				{% for course in suggested %}
 					<div class='alert alert-info'>
-						<button type="button" class="close" data-dismiss="alert">&times;</button>Hey! Some of your friends are in '{{ course.name }}'. Are you also in this course? <button>Yes</button>
+						<button type="button" class="close" data-dismiss="alert">&times;</button>Hey! Some of your friends are in '{{ course.name }}'. Wanna check it out?    <a href="{{ url_for('course',coursename=course.name) }}"><button class="btn">Yes</button></a>
 					</div>
 				{% endfor %}
 			{% endif %}
