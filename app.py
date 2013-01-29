@@ -713,12 +713,27 @@ def match(coursename):
 @app.route('/lecture/<int:lectureid>')
 def panel(lectureid):
     lecture = db.session.query(Lecture).filter(Lecture.id == lectureid).first()
-    # LIVE status
-    lecture.live
-    # Queue length
-    len(lecture.queue)
+    # LIVE status: lecture.live
+    # Queue length: lecture.queue.users.all()|count
     # Number in notes
-    lecture.queue
+    taking = 0
+    for u in lecture.users.all():
+        if u not in lecture.queue.users.all():
+            taking+=1
+    return render_template('panel.html',lecture=lecture, taking=taking)
+
+@app.route('/lecture/<int:lectureid>/polll', methods=['POST'])
+def polll(lectureid):
+    lecture = db.session.query(Lecture).filter(Lecture.id == lectureid).first()
+    taking = 0
+    for u in lecture.users.all():
+        if u not in lecture.queue.users.all():
+            taking+=1
+    print 'calc'
+    shit = {'live': lecture.live, 'queuelength': len(lecture.queue.users.all()), 'taking': taking}
+    print shit
+    return str(shit)
+
 
 @app.route('/<coursename>/<int:noteid>')
 def notepad(coursename, noteid):

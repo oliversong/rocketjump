@@ -1,0 +1,60 @@
+{% extends "layout.html" %}
+
+{% block title %}
+Panel
+{% endblock %}
+
+{% block body %}
+<div class="showcase3">
+	<div class="container">
+		<div class="row welcome">
+			<div class="span12 hello textcenter">
+				<h1 class="hasNumbers">{{ lecture.course.name }}</h1>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="orangebar"></div>
+<div class="statscontain">
+	<div class="container">
+		<div class="row">
+			<div class="span12">
+				<h1>Stats for {{ lecture.date }}</h1>
+				<h2>User statistics</h2>
+				{% if lecture.live %}
+				<span class='statistic liveStatus' style="color:green;">Live</span> status
+				{% else %}
+				<span class='statistic liveStatus' style="color:red;">Not live</span> status
+				{% endif %}
+				<br />
+				<span class="statistic numConnect">{{ taking }}</span> connections
+				<br />
+				<span class="statistic numQueued">{{ lecture.queue.users.all()|count }}</span> queued
+				<br />
+				<!--<span class="statistic wordAverage">239</span> word average<br />
+				<span class="statistic wordRate">83.5</span> wpm average-->
+			</div>
+		</div>
+		<div class="row">	
+			<div class="span12 dudegraph pull-left">
+				<div class="row pull-left duderow">
+					<div class="span1 datapoint"></div>
+					<div class="span1 datapoint"></div>
+					<div class="span1 datapoint"></div>
+					<div class="span1 datapoint"></div>
+					<div class="span1 datapoint"></div>
+					<div class="span1 datapoint"></div>
+					<div class="span1 datapoint"></div>
+					<div class="span1 datapoint"></div>
+					<div class="span1 datapoint"></div>
+					<div class="span1 datapoint"></div>
+					<div class="span1 datapoint"></div>
+					<div class="span1 datapoint"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script src="{{ url_for('static', filename='js/grapher.js') }}"></script>
+{% endblock %}

@@ -5,8 +5,8 @@ Ruby is too confusing.
 ==============
 
 ### TODO
-* Test meet someone special side
 * Analytics
+	* Live
 	* How many people are queued
 	* How many people are taking notes
 	* Length of notes that people are taking
@@ -42,3 +42,4 @@ Ruby is too confusing.
 25. Remove macbook air logo
 26. Make final graphics and put them in
 27. Test/debug reroll
+28. Test meet someone special side

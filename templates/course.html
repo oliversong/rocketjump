@@ -60,7 +60,7 @@ Course
 						{% if course.lectures.all() %}
 						Most recent lecture: {{ course.lectures.all()[-1].date }}<br />
 						{% endif %}
-						Live: {% if live %}Yes{% else %}No{% endif %}
+						Live: {% if live %}<span style="color:green;">Yes</span>{% else %}<span style="color:red;">No</span>{% endif %}
 						<br /><br />
 						{{ course.description }}
 					</div>
