@@ -412,9 +412,12 @@ app.jinja_env.globals['url_for_other_page'] = url_for_other_page
 def before_request():
     g.user = None
     if 'fid' in session:
-        g.user = db.session.query(User).from_statement(
-            "SELECT * FROM users where fid=:user_id").\
-            params(user_id=session['fid']).all()[0]
+        try:
+            g.user = db.session.query(User).from_statement(
+                "SELECT * FROM users where fid=:user_id").\
+                params(user_id=session['fid']).all()[0]
+        except:
+            session.pop('fid', None)
 
 ###
 # Routing for your application.
