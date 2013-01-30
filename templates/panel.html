@@ -9,7 +9,7 @@ Panel
 	<div class="container">
 		<div class="row welcome">
 			<div class="span12 hello textcenter">
-				<h1 class="hasNumbers">{{ lecture.course.name }}</h1>
+				<h1 class="hasNumbers" style="margin-top:30px">{{ lecture.course.name }}</h1>
 			</div>
 		</div>
 	</div>
@@ -27,7 +27,9 @@ Panel
 				<span class='statistic liveStatus' style="color:red;">Not live</span> status
 				{% endif %}
 				<br />
-				<span class="statistic numConnect">{{ taking }}</span> connections
+				<span class="statistic numEnrolled">{{ taking }}</span> Enrolled 
+				<br />
+				<span class="statistic numConnect">{{ live }}</span> connected
 				<br />
 				<span class="statistic numQueued">{{ lecture.queue.users.all()|count }}</span> queued
 				<br />

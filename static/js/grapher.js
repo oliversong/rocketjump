@@ -25,9 +25,14 @@
     console.log(pathname);
     return setTimeout((function() {
       return $.post(pathname + '/polll', function(d, st, xr) {
+        var x;
         console.log(d);
+        x = $.parseJSON(d);
         $('.duderow > div:first').remove();
-        $('.duderow').append('<div class="span1 datapoint" style="height:' + parseInt(d) * 0.05 * 300 + 'px"></div>');
+        $('.numConnect').text(x[2]);
+        $('.numQueued').text(x[0]);
+        $('.numEnrolled').text(x[1]);
+        $('.duderow').append('<div class="span1 datapoint" style="height:' + x[2] * 0.05 * 300 + 'px"><span class="intext">' + x[2] + '</span></div>');
         return poll();
       });
     }), 2000);

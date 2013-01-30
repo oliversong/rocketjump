@@ -17,15 +17,20 @@ parse = (str, separator) ->
 	setTimeout (->
 	    $.post(pathname+'/polll',(d,st,xr)->
 	        console.log(d)
+	        x=$.parseJSON(d)
 
 	        # take off the first div
-	        #$('.dudegraph div').remove()
 	        $('.duderow > div:first').remove();
+
+	        #update values
+	        $('.numConnect').text(x[2])
+	        $('.numQueued').text(x[0])
+	        $('.numEnrolled').text(x[1])
 
 	        # Get the current max value
 
 	        # Add in new value and scale heights
-	        $('.duderow').append('<div class="span1 datapoint" style="height:'+parseInt(d)*0.05*300+'px"></div>')
+	        $('.duderow').append('<div class="span1 datapoint" style="height:'+x[2]*0.05*300+'px"><span class="intext">'+x[2]+'</span></div>')
 	        
 	        #Setup the next poll recursively
 	        poll()

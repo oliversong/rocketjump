@@ -364,10 +364,9 @@ def matchmake(lecture):
 
 
 def createPad(user,course,lecture):
-    queue = lecture.queue.users.all()
     if user not in queue:
         print "putting ",user,"on the queue"
-        queue.append(user)
+        lecture.queue.users.append(user)
     now = datetime.now()
     pretty = now.strftime('%A %B %d, %Y at %I:%M%p')
     # make new etherpad for user to wait in
@@ -562,6 +561,24 @@ def home():
             unclosed.append(x)
     return render_template('home.html', collaborators=collabs, suggested=suggested, unclosed=unclosed, new=g.user.just_created)
 
+@app.route('/user/<int:userid>')
+def user(userid):
+    if 'fid' not in session:
+        return redirect(url_for('index'))
+    user = db.session.query(User).filter(User.id == userid).first()
+    collabs=[]
+    for note in user.notes:
+        for u in note.users:
+            if u != user:
+                if u not in collabs:
+                    collabs.append(u)
+    noPublic=True
+    for n in user.notes:
+        if n.public:
+            noPublic=False
+    return render_template('user.html', user=user, collabs=collabs, noPublic=noPublic)
+
+
 @app.route('/intent', methods=['POST'])
 def intent():
     intent = request.form['intent']
@@ -718,20 +735,25 @@ def panel(lectureid):
     # Number in notes
     taking = 0
     for u in lecture.users.all():
-        if u not in lecture.queue.users.all():
-            taking+=1
-    return render_template('panel.html',lecture=lecture, taking=taking)
+        taking+=1
+    live = 0
+    for n in lecture.notes.all():
+        if n.inProgress:
+            live+=len(n.users.all())
+    return render_template('panel.html',lecture=lecture, taking=taking, live=live)
 
 @app.route('/lecture/<int:lectureid>/polll', methods=['POST'])
 def polll(lectureid):
     lecture = db.session.query(Lecture).filter(Lecture.id == lectureid).first()
     taking = 0
+    liveCount = 0
     for u in lecture.users.all():
-        if u not in lecture.queue.users.all():
-            taking+=1
-    print 'calc'
+        taking+=1
+    for n in lecture.notes:
+        if n.inProgress:
+            liveCount+=len(n.users.all())
     shit = {'live': lecture.live, 'queuelength': len(lecture.queue.users.all()), 'taking': taking}
-    blah = shit['queuelength']+shit['taking']
+    blah = [shit['queuelength'], shit['taking'], liveCount]
     return str(blah)
 
 

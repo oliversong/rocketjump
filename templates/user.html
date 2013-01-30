@@ -1,24 +1,16 @@
 {% extends "layout.html" %}
 
 {% block title %}
-Home
+User
 {% endblock %}
 
 {% block body %}
 <div class="showcase2">
 	<div class="container">
 		<div class="row welcome">
-			<div class="span12 hello textcenter">
-				<h1>{% if new %}Hi there{% else %}Welcome back{% endif%}, {{ g.user.fname }}!</h1>
+			<div class="span12 hello textcenter" style="margin-top:30px">
+				<h1>{{ user.fname }}'s Info</h1>
 			</div>
-		</div>
-		<div class="row noleftmargin">
-			<form action="{{ url_for('find') }}" method=post>
-				<div class="span5 offset3">
-					<input class="span5 search findClass" data-provide="typeahead" placeholder="Find a class" type=text autocomplete=off name=courseName>
-				</div>	
-				<input class="span2 searchbtn" type=submit value=''>
-			</form>
 		</div>
 	</div>
 </div>
@@ -26,14 +18,14 @@ Home
 <div class="uppercontain">
 	<div class="container">
 		<div class="row">
-			<a href="http://www.facebook.com/{{ g.user.fid }}">
-				<div class="span2 profilePic" style="background-image:url({{ g.user.picurl }});"></div>
+			<a href="http://www.facebook.com/{{ user.fid }}">
+				<div class="span2 profilePic" style="background-image:url({{ user.picurl }});"></div>
 			</a>
 			<div class="span3 userstats">
-				<div style="margin-top:5px;font-size:1.5em;font-family:Edelsans;">{{ g.user.fname }} {{ g.user.lname }}</div>
-				{{ g.user.college }}<br />
-				{{ g.user.courses|count }} Courses<br />
-				{{ g.user.notes|count }} Notes<br />
+				<div style="margin-top:5px;font-size:1.5em;font-family:Edelsans;">{{ user.fname }} {{ user.lname }}</div>
+				{{ user.college }}<br />
+				{{ user.courses|count }} Courses<br />
+				{{ user.notes|count }} Notes<br />
 				{{ collaborators|count }} Collaborators
 			</div>
 	</div>
@@ -62,7 +54,7 @@ Home
 		<div class="row">
 			<div class="span6 pushdown">
 				<text class="courseheader">Current courses</text>
-					{% for course in g.user.courses %}
+					{% for course in user.courses %}
 						<a href="{{ url_for('course', coursename=course.name) }}">
 							<div class='coursetab'>
 								<div class="tabheader">{{ course.name }}</div>
@@ -85,7 +77,7 @@ Home
 					<div class="span6 pushdown">
 						<text class="courseheader">Collaborators</text><br />
 						{% for collaborator in collaborators %}
-							<a href="{{ url_for('user',userid=collaborator.id) }}">
+							<a href="url_for('user',userid=collaborator.id)">
 								<div class='kewl'>
 									<img src="{{ collaborator.picurl }}" class="collabProfile" />
 									<br />
@@ -99,36 +91,27 @@ Home
 				</div>
 				<div class="row oldnoterow">
 					<div class="span6 pushdown">
-						<text class="courseheader">Old notes</text>
+						<text class="courseheader">Public notes</text>
 						<ul class="notes">
-							{% for note in g.user.notes %}
-								<li><a href="{{ url_for('notepad', coursename=note.course.name, noteid=note.id) }}" target="_self">{{ note.course.name }} - {{ note.date }} - {{ note.name }}</a></li>
-							{% else %}
-								<h3>No notes so far</h3>
+						{% if g.user.public_access %}
+							{% for note in user.notes[::-1] %}
+								{% if note.public %}
+									<li><a href="{{ url_for('notepad', coursename=note.course.name, noteid=note.id, public=True) }}" target="_self">{{ note.course.name }} - {{ note.date }} - {{ note.name }}</a></li>
+								{% endif %}
 							{% endfor %}
+							{% if noPublic %}
+								<h3>No public notes yet!</h3>
+							{% endif %}
+						{% else %}
+							<h3>You must publish a note before you can view others' notes!</h3>
+						{% endif %}
 						</ul>
 					</div>
 				</div>
+
 			</div>
 		</div>
 	</div>
 </div>
-<script src="{{ url_for('static', filename='js/remote-typeahead.js') }}"></script>
-
-{% if new %}
-<div id="helloThere" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-  <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-    <h2 id="myModalLabel">Welcome to Notability!</h2>
-  </div>
-  <div class="modal-body">
-    <p>Choose your intent:</p>
-    <button class="meetNewPeople"></button><button class="meetSpecial"></button><br /><br />
-    <small>(Don't worry, you can change this in your settings later)</small>
-  </div>
-</div>
-
-<script src="{{ url_for('static', filename='js/sayHello.js') }}"></script>
-{% endif %}
 
 {% endblock %}
