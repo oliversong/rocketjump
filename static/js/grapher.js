@@ -28,11 +28,15 @@
         var x;
         console.log(d);
         x = $.parseJSON(d);
-        $('.duderow > div:first').remove();
+        $('.duderow1 > div:first').remove();
+        $('.duderow2 > div:first').remove();
+        $('.duderow3 > div:first').remove();
         $('.numConnect').text(x[2]);
         $('.numQueued').text(x[0]);
         $('.numEnrolled').text(x[1]);
-        $('.duderow').append('<div class="span1 datapoint" style="height:' + x[2] * 0.05 * 300 + 'px"><span class="intext">' + x[2] + '</span></div>');
+        $('.duderow1').append('<div class="span1 datapoint" style="height:' + x[1] * 0.05 * 300 + 'px"><span class="intext">' + x[1] + '</span></div>');
+        $('.duderow2').append('<div class="span1 datapoint" style="height:' + x[2] * 0.05 * 300 + 'px"><span class="intext">' + x[2] + '</span></div>');
+        $('.duderow3').append('<div class="span1 datapoint" style="height:' + x[0] * 0.05 * 300 + 'px"><span class="intext">' + x[0] + '</span></div>');
         return poll();
       });
     }), 2000);

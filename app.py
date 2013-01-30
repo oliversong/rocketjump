@@ -364,6 +364,7 @@ def matchmake(lecture):
 
 
 def createPad(user,course,lecture):
+    queue = lecture.queue.users.all()
     if user not in queue:
         print "putting ",user,"on the queue"
         lecture.queue.users.append(user)
