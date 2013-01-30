@@ -747,13 +747,13 @@ def notepad(coursename, noteid):
             print "read only mode"
             return render_template('notepad.html', note=note, public=True)
     else:
-        sid = db.session.query(SessionID).filter(SessionID.user == user).filter(SessionID.note == note).first().sessionID
-        note.inProgress = True
-        note.lecture.live = True
-        db.session.commit()
         if note not in user.notes:
             flash("Sorry, you're not part of that note!")
             redirect(url_for('home'))
+        note.inProgress = True
+        note.lecture.live = True
+        db.session.commit()
+        sid = db.session.query(SessionID).filter(SessionID.user == user).filter(SessionID.note == note).first().sessionID
         response = make_response(render_template('notepad.html',note=note, public=False))
         response.set_cookie('sessionID', sid, domain=DOMAIN)
         return response
