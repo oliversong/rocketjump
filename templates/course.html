@@ -69,7 +69,7 @@ Course
 					<div class="span6">
 						<div class="courseheader2">Students</div>
 						{% for student in course.users.all() %}
-							<a href="http://www.facebook.com/{{ student.fid }}">
+							<a href="{{ url_for('user',userid=student.id) }}">
 								<div class='kewl'>
 									<img src="{{ student.picurl }}" class="collabProfile" />
 									<br />
