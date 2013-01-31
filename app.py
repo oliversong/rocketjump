@@ -333,7 +333,7 @@ def matchmake(lecture):
     # look in to queue, find user that matches current user's preference
     genderpref = g.user.interested_in
     intent = g.user.intent
-    print "matching for user:",g.user,"with genderpref/intent",genderpref,"/",intent
+    # print "matching for user:",g.user,"with genderpref/intent",genderpref,"/",intent
     users = lecture.queue.users.all()
     print 'current queue', users
     if len(users) != 0:
@@ -366,7 +366,7 @@ def matchmake(lecture):
 def createPad(user,course,lecture):
     queue = lecture.queue.users.all()
     if user not in queue:
-        print "putting ",user,"on the queue"
+        # print "putting ",user,"on the queue"
         lecture.queue.users.append(user)
     now = datetime.now()
     pretty = now.strftime('%A %B %d, %Y at %I:%M%p')
@@ -429,7 +429,7 @@ def handle_oauth_exception(error):
     print error.data
     print error.message
     print error.type
-    return ':('
+    return redirect(url_for('index'))
 
 @app.route('/')
 def index():
@@ -469,9 +469,13 @@ def facebook_authorized(resp):
         education='Massachusetts Institute of Technology (MIT)'
         if 'education' in me.data:
             education=me.data['education'][-1]['school']['name']
-        email = me.data['email']
+        email = ''
+        if 'email' in me.data:
+            email = me.data['email']
         username = me.data['username']
-        gender = me.data['gender']
+        gender='male'#if your gender isn't specified...well I don't even know
+        if 'gender' in me.data:
+            gender = me.data['gender']
         if 'interested_in' in me.data:
             interested = me.data['interested_in']
             if len(interested)==2:
@@ -492,7 +496,7 @@ def facebook_authorized(resp):
                 interested='female'
             else:
                 interested='male'
-        print fid, fname, lname, gender, interested, email, username, education
+        # print fid, fname, lname, gender, interested, email, username, education
         newuser = User(fid, fname, lname, gender, interested, email, username, education)
         db.session.add(newuser)
         db.session.commit()
@@ -595,7 +599,7 @@ def intent():
 def search():
     print "getting request"
     query = request.args['callback']
-    print "this is the query:", query
+    # print "this is the query:", query
     result = db.session.query(Course).filter(Course.name.ilike('%'+query+'%')).limit(10).all()
     result = [x.name for x in result]
 
@@ -623,8 +627,6 @@ def course(coursename):
     if len(courseobj)==0:
         flash('No courses found by that name.')
         return redirect(url_for('home'))
-    elif len(courseobj)>1:
-        raise Exception('More than one course by that name...uh oh.')
     else:
         if request.method == 'POST':
             if 'fid' not in session:
@@ -633,6 +635,8 @@ def course(coursename):
             db.session.commit()
             enrolled = True
         else:
+            if 'fid' not in session:
+                redirect(url_for('index'))
             if courseobj[0] in g.user.courses:
                 enrolled = True
             else:
