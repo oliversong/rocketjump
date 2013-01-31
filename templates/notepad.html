@@ -9,7 +9,7 @@ Pad
 <div class="container">
 		<div class="row">
 			<div class="{% if not public %}span10{% else %}span12{% endif %}">
-				<h2>{{ note.course.name }} - {{ note.lecture.date }} - 
+				<h2>{{ note.course.name }} - {{ note.date }} - 
 					<span class="noteName" coursename="{{ note.course.name }}" noteid="{{ note.id }}">
 						{% if not public %}
 						<text data-type="editable" data-for=".awwyee">{{ "'"+note.name+"'" }}</text><input class="awwyee" />
