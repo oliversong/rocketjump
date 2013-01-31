@@ -681,6 +681,7 @@ footer a:hover{
 .duderow{
     min-height:300px;
     position:relative;
+    padding-left:20px;
 }
 .datapoint{
     background-color:@orange;
@@ -688,8 +689,32 @@ footer a:hover{
     min-height:3px;
     text-align:center;
     position:relative;
+    width:30px;
+    margin-left:10px;
+}
+@media (max-width: 1199px){
+    .datapoint{
+        width:24px;
+        margin-left:8px;
+
+    }
+}
+@media (max-width: 767px){
+    .datapoint{
+        width:10px;
+        margin-left:4px;
+
+    }
+}
+@media (max-width: 979px){
+    .datapoint{
+        width:18px;
+        margin-left:6px;
+
+    }
 }
 .intext{
     position:absolute;
     bottom:-20px;
+    margin-left:-3px;
 }
