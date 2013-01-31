@@ -10,7 +10,7 @@ from __future__ import with_statement
 import  time, os, sys, json
 from flask import Flask, render_template, request, redirect, url_for, abort, g, flash, escape, session, make_response
 from werkzeug import check_password_hash, generate_password_hash
-from datetime import datetime
+from datetime import datetime, tzinfo, timedelta
 from flask_oauth import OAuth, OAuthException
 from flask.ext.sqlalchemy import SQLAlchemy
 from sqlalchemy import desc
@@ -325,6 +325,12 @@ class ItsdangerousSessionInterface(SessionInterface):
                             expires=expires, httponly=True,
                             domain=domain)
 
+class EST(tzinfo):
+    def utcoffset(self, dt):
+      return timedelta(hours=-5)
+
+    def dst(self, dt):
+        return timedelta(0)
 
 def matchmake(lecture):
 
@@ -368,7 +374,7 @@ def createPad(user,course,lecture):
     if user not in queue:
         # print "putting ",user,"on the queue"
         lecture.queue.users.append(user)
-    now = datetime.now()
+    now = datetime.now(EST())
     pretty = now.strftime('%A %B %d, %Y at %I:%M%p')
     # make new etherpad for user to wait in
     newNote = Note(pretty, lecture, course, [user]) # init also creates a new pad at /p/groupID$noteID
@@ -383,7 +389,7 @@ def createPad(user,course,lecture):
 
 def createLecture(user, course):
     # create new lecture
-    now = datetime.now()
+    now = datetime.now(EST())
     pretty = now.strftime('%A %B %d, %Y at %I:%M%p')
 
     newLecture = Lecture(pretty, course)
@@ -799,15 +805,20 @@ def done(coursename, noteid):
         print "note not in user's notes"
         abort(401)
     print note.liveCount
+    # note inprogress
     note.liveCount -= 1
     if note.liveCount <= 0:
         print "note turned off"
         note.inProgress = False
+    # lecture live
     result = False
     for blah in note.lecture.notes:
         if blah.inProgress:
             result = True
     note.lecture.live = result
+    # if user was in queue, take him off
+    if g.user in note.lecture.queue.users.all():
+        note.lecture.queue.users.remove(g.user)
     if public:
         note.public = True
         # note.roID = pad.getReadOnlyID(note.padID)['readOnlyID']

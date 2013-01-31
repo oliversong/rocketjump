@@ -34,9 +34,9 @@
         $('.numConnect').text(x[2]);
         $('.numQueued').text(x[0]);
         $('.numEnrolled').text(x[1]);
-        $('.duderow1').append('<div class="span1 datapoint" style="height:' + x[1] * 0.05 * 300 + 'px"><span class="intext">' + x[1] + '</span></div>');
-        $('.duderow2').append('<div class="span1 datapoint" style="height:' + x[2] * 0.05 * 300 + 'px"><span class="intext">' + x[2] + '</span></div>');
-        $('.duderow3').append('<div class="span1 datapoint" style="height:' + x[0] * 0.05 * 300 + 'px"><span class="intext">' + x[0] + '</span></div>');
+        $('.duderow1').append('<div class="span1 datapoint" style="height:' + x[1] * 0.01 * 300 + 'px"><span class="intext">' + x[1] + '</span></div>');
+        $('.duderow2').append('<div class="span1 datapoint" style="height:' + x[2] * 0.01 * 300 + 'px"><span class="intext">' + x[2] + '</span></div>');
+        $('.duderow3').append('<div class="span1 datapoint" style="height:' + x[0] * 0.01 * 300 + 'px"><span class="intext">' + x[0] + '</span></div>');
         return poll();
       });
     }), 2000);

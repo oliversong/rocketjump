@@ -1,7 +1,4 @@
 ### TODO
-* Test run with at least 10 people
-* Make presentation video / rehearse
-* Fix that crappy ass live graph to update and look good
 * Analytics - create socket between flask and node.js app, pass message whenever there is a pad edit; handle all calculations on flask
 	* Live
 	* How many people are queued
@@ -41,3 +38,6 @@
 27. Test/debug reroll
 28. Test meet someone special side
 29. Public profiles
+30. Test run with at least 10 people
+31. Make presentation video / rehearse
+32. Fix that crappy ass live graph to update and look good
