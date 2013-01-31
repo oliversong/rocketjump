@@ -517,7 +517,6 @@ def get_facebook_oauth_token():
 @app.route('/logout')
 def logout():
     """Log out dat"""
-    flash('You were logged out')
     session.pop('fid', None)
     resp = make_response(redirect(url_for('index')))
     resp.set_cookie('sessionID', '', expires=0, domain=DOMAIN)
