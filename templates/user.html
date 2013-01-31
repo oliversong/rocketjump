@@ -26,7 +26,7 @@ User
 				{{ user.college }}<br />
 				{{ user.courses|count }} Courses<br />
 				{{ user.notes|count }} Notes<br />
-				{{ collaborators|count }} Collaborators
+				{{ collabs|count }} Collaborators
 			</div>
 	</div>
 </div>
@@ -76,8 +76,8 @@ User
 				<div class="row">
 					<div class="span6 pushdown">
 						<text class="courseheader">Collaborators</text><br />
-						{% for collaborator in collaborators %}
-							<a href="url_for('user',userid=collaborator.id)">
+						{% for collaborator in collabs %}
+							<a href="{{ url_for('user',userid=collaborator.id) }}">
 								<div class='kewl'>
 									<img src="{{ collaborator.picurl }}" class="collabProfile" />
 									<br />

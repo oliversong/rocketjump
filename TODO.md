@@ -6,6 +6,7 @@
 	* Length of notes that people are taking
 	* Typing speed of notes that people are taking
 * Professor dashboard
+* Timeout and gracefully clean notes / queued notes where users have closed the window.
 
 
 ### Done
