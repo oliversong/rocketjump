@@ -760,7 +760,7 @@ def polll(lectureid):
     lecture = db.session.query(Lecture).filter(Lecture.id == lectureid).first()
     taking = 0
     liveCount = 0
-    for u in lecture.users.all():
+    for u in lecture.course.users.all():
         taking+=1
     for n in lecture.notes:
         if n.inProgress:
