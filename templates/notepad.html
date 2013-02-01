@@ -55,4 +55,11 @@ Pad
 	</div>
 </div>
 
+
+<script>
+window.onbeforeunload = function(){
+	$.post(window.location.pathname+'/done','');
+}
+</script>
+
 {% endblock %}

@@ -6,7 +6,6 @@
 	* Length of notes that people are taking
 	* Typing speed of notes that people are taking
 * Professor dashboard
-* Timeout and gracefully clean notes / queued notes where users have closed the window.
 
 
 ### Done
@@ -42,3 +41,4 @@
 30. Test run with at least 10 people
 31. Make presentation video / rehearse
 32. Fix that crappy ass live graph to update and look good
+33. Confirm on close and close notes

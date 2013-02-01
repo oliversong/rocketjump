@@ -156,15 +156,15 @@ class User(db.Model):
     sessionID = db.relationship('SessionID', backref='user', lazy='dynamic')
     college = db.Column(db.String(120))
 
-    def __init__(self, fid, fname, lname, gender, interested, email, username, college):
+    def __init__(self, fid, fname, lname, gender, interested, email, college):
         self.fid = fid
         self.fname = fname
         self.lname = lname
         self.email = email
         self.gender = gender
         self.interested_in = interested
-        self.picurl = "http://graph.facebook.com/"+username+"/picture?width=200&height=200"
-        self.spicurl = "https://graph.facebook.com/"+username+"/picture?type=square"
+        self.picurl = "http://graph.facebook.com/"+fid+"/picture?width=200&height=200"
+        self.spicurl = "https://graph.facebook.com/"+fid+"/picture?type=square"
         self.authorID = pad.createAuthorIfNotExistsFor(fid,fname+' '+lname)['authorID']
         self.college = college
 
@@ -478,7 +478,6 @@ def facebook_authorized(resp):
         email = ''
         if 'email' in me.data:
             email = me.data['email']
-        username = me.data['username']
         gender='male'#if your gender isn't specified...well I don't even know
         if 'gender' in me.data:
             gender = me.data['gender']
@@ -503,7 +502,7 @@ def facebook_authorized(resp):
             else:
                 interested='male'
         # print fid, fname, lname, gender, interested, email, username, education
-        newuser = User(fid, fname, lname, gender, interested, email, username, education)
+        newuser = User(fid, fname, lname, gender, interested, email, education)
         db.session.add(newuser)
         db.session.commit()
     print 'giving session token'
